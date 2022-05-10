@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from coreapp.models import Product, Article, Brand, Offer, Shop
+from coreapp.models import Product, Article, Brand, Offer, Shop, Site
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['article', 'name']
-    search_fields = ['article', 'name']
+    list_display = ['article', 'name', 'brand']
+    search_fields = ['article', 'name', 'brand']
     list_filter = ['brand']
     raw_id_fields = ['article', ]
 
@@ -36,3 +36,9 @@ class ShopAdmin(admin.ModelAdmin):
     list_display = ['name', 'address', 'phone']
     search_fields = ['name', 'address', 'phone']
     raw_id_fields = ['site']
+
+
+@admin.register(Site)
+class SiteAdmin(admin.ModelAdmin):
+    list_display = ['name', 'url']
+    search_fields = ['name', 'url']
