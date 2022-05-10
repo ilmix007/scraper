@@ -73,6 +73,7 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     img = models.ManyToManyField(ImgLink, verbose_name='Изображения', null=True, blank=True)
     count = models.IntegerField(verbose_name='Количество')
+    price = models.FloatField(verbose_name='Цена')
 
 
 class Meta:
