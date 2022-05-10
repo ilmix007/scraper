@@ -1,12 +1,6 @@
 from django.db import models
 
 
-class Shop(models.Model):
-    name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
-    created = models.DateTimeField(verbose_name='Дата добавления', auto_now_add=True)
-    updated = models.DateTimeField(verbose_name='Последнее изменение', auto_now=True)
-
-
 class Region(models.Model):
     """Регион"""
     name = models.CharField(verbose_name='Наименование', max_length=128, unique=True)
