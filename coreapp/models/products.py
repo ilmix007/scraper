@@ -40,7 +40,7 @@ class Product(CreatedMixin, UpdatedMixin, models.Model):
     article = models.ForeignKey(Article, verbose_name='Артикул', related_name='products',
                                 on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(verbose_name='Наименование', max_length=255, unique=True)
-    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', null=True, blank=True)
+    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.article} - {self.brand})'
@@ -71,7 +71,7 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.CASCADE)
     link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
-    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', null=True, blank=True)
+    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', blank=True)
     count = models.IntegerField(verbose_name='Количество')
     price = models.FloatField(verbose_name='Цена')
 

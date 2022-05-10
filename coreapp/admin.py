@@ -25,7 +25,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ['product', 'shop', 'count']
+    list_display = ['product', 'shop', 'count', 'price']
     search_fields = ['product', 'shop']
     list_filter = ['product__brand']
     raw_id_fields = ['product', 'shop']
