@@ -57,10 +57,6 @@ class Parameter(CreatedMixin, UpdatedMixin, models.Model):
         verbose_name_plural = 'Параметры товаров'
 
 
-class OfferLink(CreatedMixin, UpdatedMixin, models.Model):
-    url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
-
-
 class ImgLink(CreatedMixin, UpdatedMixin, models.Model):
     url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     alt = models.CharField(verbose_name='Альтернативный текст', max_length=63)
@@ -70,7 +66,7 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     """ Параметры товаров """
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.PROTECT)
-    link = models.ForeignKey(OfferLink, verbose_name='Ссылка', max_length=255, on_delete=models.CASCADE)
+    link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     img = models.ManyToManyField(ImgLink, verbose_name='Изображения')
     count = models.IntegerField(verbose_name='Количество')
 
