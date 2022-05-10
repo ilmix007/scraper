@@ -11,6 +11,10 @@ class Site(CreatedMixin, UpdatedMixin, models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Сайт'
+        verbose_name_plural = 'Сайты'
+
 
 class Shop(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
@@ -20,3 +24,7 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Магазин'
+        verbose_name_plural = 'Магазины'

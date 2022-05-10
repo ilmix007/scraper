@@ -75,6 +75,11 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     count = models.IntegerField(verbose_name='Количество')
     price = models.FloatField(verbose_name='Цена')
 
+    class Meta:
+        verbose_name = 'Предложение'
+        verbose_name_plural = 'Предложения'
+
+
 
 class Meta:
     unique_together = ('product', 'shop')
