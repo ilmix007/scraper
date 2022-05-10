@@ -70,6 +70,6 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     """ Параметры товаров """
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.PROTECT)
-    link = models.ForeignKey(OfferLink, verbose_name='Ссылка', max_length=255, unique=True, on_delete=models.CASCADE)
+    link = models.ForeignKey(OfferLink, verbose_name='Ссылка', max_length=255, on_delete=models.CASCADE)
     img = models.ManyToManyField(ImgLink, verbose_name='Изображения')
     count = models.IntegerField(verbose_name='Количество')
