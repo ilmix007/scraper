@@ -73,3 +73,8 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     link = models.ForeignKey(OfferLink, verbose_name='Ссылка', max_length=255, on_delete=models.CASCADE)
     img = models.ManyToManyField(ImgLink, verbose_name='Изображения')
     count = models.IntegerField(verbose_name='Количество')
+
+    class Meta:
+        unique_together = ("product", "shop")
+        verbose_name = 'Предложение'
+        verbose_name_plural = 'Предложения'
