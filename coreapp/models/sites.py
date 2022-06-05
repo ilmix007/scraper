@@ -7,6 +7,7 @@ from coreapp.mixins.db import CreatedMixin, UpdatedMixin
 class Site(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
     url = models.URLField(verbose_name='url', unique=True, max_length=255)
+    crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -28,3 +29,8 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
     class Meta:
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'
+
+
+class Url(CreatedMixin, UpdatedMixin, models.Model):
+    link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
+    cite = models.ForeignKey(Site, verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
