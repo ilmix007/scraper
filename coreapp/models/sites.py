@@ -10,6 +10,10 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
     alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)
     last_processing = models.DateTimeField(verbose_name='Дата последней обработки', auto_now=True)
 
+    class Meta:
+        verbose_name = 'Ссылка'
+        verbose_name_plural = 'Ссылки'
+
 
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)

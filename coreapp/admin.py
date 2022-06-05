@@ -1,9 +1,17 @@
 from django.contrib import admin
-from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter
+from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Url
 from coreapp.service.sites import SiteFacade
 import logging
 
 LOGGER = logging.getLogger(__name__)
+
+
+@admin.register(Url)
+class UrlAdmin(admin.ModelAdmin):
+    list_display = ['link', 'site', 'last_processing']
+    search_fields = ['link', 'site']
+    list_filter = ['site']
+    raw_id_fields = ['site']
 
 
 @admin.register(Product)
