@@ -45,13 +45,19 @@ class ShopAdmin(admin.ModelAdmin):
 class SiteAdmin(admin.ModelAdmin):
     list_display = ['title', 'url']
     search_fields = ['name', 'url']
-    actions = ['read_robots']
+    actions = ['read_robots', 'read_sitemap']
 
     @staticmethod
     def read_robots(cls, request, queryset):
         for site in queryset:
             site_facade = SiteFacade(site)
             site_facade.read_robots()
+
+    @staticmethod
+    def read_sitemap(cls, request, queryset):
+        for site in queryset:
+            site_facade = SiteFacade(site)
+            site_facade.read_sitemap()
 
 
 @admin.register(SiteParameter)
