@@ -6,7 +6,7 @@ from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, Fin
 
 class Url(CreatedMixin, UpdatedMixin, models.Model):
     link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
-    cite = models.ForeignKey('coreapp.Site', verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
+    site = models.ForeignKey('coreapp.Site', verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
     alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)
     last_processing = models.DateTimeField(verbose_name='Дата последней обработки', auto_now=True)
 
@@ -15,7 +15,6 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
     url = models.URLField(verbose_name='url', unique=True, max_length=255)
     crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
-    sitemap = models.ForeignKey(Url, verbose_name='Sitemap', null=True, blank=True, on_delete=models.SET_NULL)
     DEFAULT_TIMEOUT = 0.5
 
     def __str__(self):
