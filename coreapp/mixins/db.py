@@ -1,14 +1,7 @@
 from django.db import models
 
 
-class BaseMixin(models.Model):
-    """ Базовый класс миксинов """
-
-    class Meta:
-        abstract = True
-
-
-class CreatedMixin(BaseMixin):
+class CreatedMixin(models.Model):
     """ Добавляет поле created """
     created = models.DateTimeField(verbose_name='Добавлен', auto_now_add=True)
 
@@ -16,7 +9,7 @@ class CreatedMixin(BaseMixin):
         abstract = True
 
 
-class UpdatedMixin(BaseMixin):
+class UpdatedMixin(models.Model):
     """ Добавляет поле updated """
     updated = models.DateTimeField(verbose_name='Изменен', auto_now=True)
 
@@ -24,7 +17,7 @@ class UpdatedMixin(BaseMixin):
         abstract = True
 
 
-class StartProcessMixin(BaseMixin):
+class StartProcessMixin(models.Model):
     """ Добавляет поле start_process """
     start_process = models.DateTimeField(verbose_name='Начало обработки', null=True, blank=True)
 
@@ -32,7 +25,7 @@ class StartProcessMixin(BaseMixin):
         abstract = True
 
 
-class FinishProcessMixin(BaseMixin):
+class FinishProcessMixin(models.Model):
     """ Добавляет поле finish_process """
     finish_process = models.DateTimeField(verbose_name='Конец обработки', null=True, blank=True)
 
@@ -40,7 +33,7 @@ class FinishProcessMixin(BaseMixin):
         abstract = True
 
 
-class LastProcessMixin(BaseMixin):
+class LastProcessMixin(models.Model):
     """ Добавляет поле last_process """
     last_process = models.DateTimeField(verbose_name='Последняя обработка', null=True, blank=True)
 
