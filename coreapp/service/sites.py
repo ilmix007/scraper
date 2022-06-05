@@ -33,7 +33,7 @@ class SiteFacade:
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
         }
         # 'Mozilla/5.0(X11; Linux x86_64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 102.0.5005.61 Safari/537.36'
-        result_data_set = {'Disallow': [], 'Allow': [], 'Sitemap': [], 'Clean-param': []}
+        result_data_set = dict()
 
         result = requests.get(url, headers=headers)
         if result.status_code == 200:
@@ -41,14 +41,11 @@ class SiteFacade:
             result = result.replace('\r', '')
             for line in result.split("\n"):
                 result = result.replace('\r', '')
-                if line.startswith('Allow'):
-                    result_data_set["Allow"].append(line.split(': ')[1].split(' ')[0])
-                elif line.startswith('Disallow'):
-                    result_data_set["Disallow"].append(line.split(': ')[1].split(' ')[0])
-                elif line.startswith('Sitemap'):
-                    result_data_set["Sitemap"].append(line.split(': ')[1].split(' ')[0])
-                elif line.startswith('Clean-param'):
-                    result_data_set["Clean-param"].append(line.split(': ')[1].split(' ')[0])
+                key = line.split(': ')[0].split(' ')[0]
+                value = line.split(': ')[1].split(' ')[0]
+                if key not in result_data_set.keys():
+                    result_data_set[key] = list()
+                result_data_set[key].append(value)
             for key, values in result_data_set.items():
                 self.set_params(key, values)
             return True
