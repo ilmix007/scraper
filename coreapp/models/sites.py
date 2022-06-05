@@ -34,3 +34,4 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
 class Url(CreatedMixin, UpdatedMixin, models.Model):
     link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     cite = models.ForeignKey(Site, verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
+    alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)

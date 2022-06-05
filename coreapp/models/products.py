@@ -23,15 +23,9 @@ class Article(CreatedMixin, UpdatedMixin, models.Model):
     def __str__(self):
         return self.art
 
-
     class Meta:
         verbose_name = 'Артикул'
         verbose_name_plural = 'Артикулы'
-
-
-class ImgLink(CreatedMixin, UpdatedMixin, models.Model):
-    url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
-    alt = models.CharField(verbose_name='Альтернативный текст', max_length=63)
 
 
 class Product(CreatedMixin, UpdatedMixin, models.Model):
@@ -40,14 +34,13 @@ class Product(CreatedMixin, UpdatedMixin, models.Model):
     article = models.ForeignKey(Article, verbose_name='Артикул', related_name='products',
                                 on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(verbose_name='Наименование', max_length=255, unique=True)
-    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.article} - {self.brand})'
 
     class Meta:
         ordering = ['name']
-        unique_together = ('article', 'name')
+        unique_together = ('article', 'brand')
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 
@@ -71,17 +64,11 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.CASCADE)
     link = models.ForeignKey(Url, verbose_name='Ссылка', related_name='offers', on_delete=models.CASCADE)
-    img = models.ManyToManyField(ImgLink, verbose_name='Изображения', blank=True)
+    imgs = models.ManyToManyField(Url, verbose_name='Изображения', blank=True)
     count = models.IntegerField(verbose_name='Количество')
     price = models.FloatField(verbose_name='Цена')
 
     class Meta:
+        unique_together = ('product', 'shop')
         verbose_name = 'Предложение'
         verbose_name_plural = 'Предложения'
-
-
-
-class Meta:
-    unique_together = ('product', 'shop')
-    verbose_name = 'Предложение'
-    verbose_name_plural = 'Предложения'
