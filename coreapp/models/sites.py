@@ -58,6 +58,9 @@ class SiteParameter(models.Model):
         verbose_name_plural = 'Параметры сайтов'
         unique_together = ('key', 'value', 'site')
 
+    def __str__(self):
+        return f'{self.key}: {self.value} ({self.site})'
+
 
 class Shop(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
