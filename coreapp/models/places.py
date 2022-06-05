@@ -22,7 +22,7 @@ class City(models.Model):
     long = models.IntegerField(verbose_name='Долгота', null=True, blank=True)
 
     class Meta:
-        unique_together = ("name", "region")
+        unique_together = ('name', 'region')
         verbose_name = 'Город'
         verbose_name_plural = 'Города'
         ordering = ['name']
