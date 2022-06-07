@@ -47,7 +47,7 @@ class BaseDriver:
         self.headers = {'User-Agent': self.user_agent}
         self.soup = None
 
-    def process_robots(self, robots_txt):
+    def process_robots(self, robots_txt) -> dict:
         result_data_set = dict()
         robots_txt = robots_txt.replace('\r', '')
         robots_txt = robots_txt.replace('\t', '')
