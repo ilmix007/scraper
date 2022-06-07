@@ -1,7 +1,9 @@
 from django.contrib import admin
+from coreapp.drivers.driver import Driver
 from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Url
-from coreapp.service.sites import SiteFacade
 import logging
+
+from coreapp.service.sites import SiteFacade
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,19 +55,28 @@ class ShopAdmin(admin.ModelAdmin):
 class SiteAdmin(admin.ModelAdmin):
     list_display = ['title', 'url']
     search_fields = ['name', 'url']
-    actions = ['read_robots', 'read_sitemap']
+    actions = ['read_robots', 'read_sitemap', 'clear_urls']
 
-    @staticmethod
-    def read_robots(cls, request, queryset):
+    def read_robots(self, request, queryset):
         for site in queryset:
             site_facade = SiteFacade(site)
-            site_facade.read_robots()
+            handler = Driver(site_facade)
+            handler.read_robots()
 
-    @staticmethod
-    def read_sitemap(cls, request, queryset):
+    def read_sitemap(self, request, queryset):
         for site in queryset:
             site_facade = SiteFacade(site)
-            site_facade.read_sitemap()
+            handler = Driver(site_facade)
+            handler.read_sitemap()
+
+    def clear_urls(self, request, queryset):
+        for site in queryset:
+            site_facade = SiteFacade(site)
+            site_facade.clear_urls()
+
+    read_robots.short_description = 'Прочитать robots.txt'
+    read_sitemap.short_description = 'Прочитать sitemap'
+    clear_urls.short_description = 'Очистить ссылки сайта'
 
 
 @admin.register(SiteParameter)
