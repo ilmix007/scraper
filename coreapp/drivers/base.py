@@ -1,6 +1,9 @@
+from random import randint
 import requests
 from bs4 import BeautifulSoup
 import logging
+
+from coreapp.drivers.user_agents import USER_AGENTS
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver']
@@ -40,9 +43,7 @@ class BaseDriver:
     """Фасад для работы с сайтом"""
 
     def __init__(self):
-        self.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) ' \
-                          'Chrome/50.0.2661.102 Safari/537.36'
-        # 'Mozilla/5.0(X11; Linux x86_64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 102.0.5005.61 Safari/537.36'
+        self.user_agent = USER_AGENTS[randint(0, len(USER_AGENTS) - 1)]
         self.headers = {'User-Agent': self.user_agent}
         self.soup = None
 
@@ -61,7 +62,7 @@ class BaseDriver:
                 result_data_set[key].append(value)
             return result_data_set, True
         else:
-            LOGGER.error(f"Error receiving robots.txt {result}")
+            LOGGER.error(f"Error receiving robots.txt {result}. User-agent: {self.user_agent}")
             return dict(), False
 
     def _process_sitemap(self, soup):
@@ -75,7 +76,7 @@ class BaseDriver:
                 soup = BeautifulSoup(result.content, features='xml')
                 result_urls.extend(self._process_sitemap(soup))
             else:
-                LOGGER.error(f"Error receiving sitemap {result}")
+                LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
             break
         result_urls.extend(soup.find_all("url"))
         return result_urls
@@ -87,7 +88,7 @@ class BaseDriver:
                 soup = BeautifulSoup(result.content, features='xml')
                 return self._process_sitemap(soup)
             else:
-                LOGGER.error(f"Error receiving sitemap {result}")
+                LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
                 return False
 
     def scrape(self, url) -> list[Offer]:
