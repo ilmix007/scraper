@@ -6,11 +6,41 @@ LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver']
 
 
+class Shop:
+    def __init__(self, url, phone, name='', address='', city=''):
+        self.name = name
+        self.address = address
+        self.phone = phone
+        self.url = url
+        self.city = city
+
+
+class Product:
+    def __init__(self, name, brand='', article=''):
+        self.name = name
+        self.brand = brand
+        self.article = article
+
+
+class Offer:
+    def __init__(self, product, shop, url, count=0):
+        self.product = product
+        self.count = count
+        self.shop = shop
+        self.url = url
+
+
+class ScrabeResult:
+    def __init__(self, products: list[Product], shops: list[Shop], offers: list[Offer]):
+        self.products = products
+        self.shops = shops
+        self.offers = offers
+
+
 class BaseDriver:
     """Фасад для работы с сайтом"""
 
     def __init__(self):
-        # self.site = site
         self.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) ' \
                           'Chrome/50.0.2661.102 Safari/537.36'
         # 'Mozilla/5.0(X11; Linux x86_64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 102.0.5005.61 Safari/537.36'
@@ -60,3 +90,11 @@ class BaseDriver:
             else:
                 LOGGER.error(f"Error receiving sitemap {result}")
                 return False
+
+    def scrape(self, url) -> list[Offer]:
+        """Возвращает список офферов"""
+        pass
+
+    def get_shops(self, url) -> list[Shop]:
+        """Возвращает список магазинов"""
+        pass
