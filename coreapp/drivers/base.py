@@ -47,7 +47,7 @@ class BaseDriver:
         self.headers = {'User-Agent': self.user_agent}
         self.soup = None
 
-    def process_robots(self, robots_txt) -> dict:
+    def process_robots(self, robots_txt: str) -> dict:
         result_data_set = dict()
         robots_txt = robots_txt.replace('\r', '')
         robots_txt = robots_txt.replace('\t', '')
@@ -67,7 +67,7 @@ class BaseDriver:
                     result_data_set[key].append(value)
         return result_data_set
 
-    def get_robots(self, url):
+    def get_robots(self, url: str):
         try:
             result = requests.get(url, headers=self.headers)
         except Exception as ex:
@@ -83,7 +83,7 @@ class BaseDriver:
         LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
         return dict(), False
 
-    def _process_sitemap(self, soup):
+    def _process_sitemap(self, soup: BeautifulSoup) -> list:
         """Рекурсивная функция обработки sitemap"""
         result_urls = list()
         sitemap_tags = soup.find_all("sitemap")

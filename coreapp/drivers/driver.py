@@ -19,7 +19,7 @@ class Driver:
     def _get_drive_class(self):
         return DRIVER_CONF.get(self.site.get_domain())
 
-    def read_robots(self):
+    def read_robots(self) -> bool:
         url = f'{self.site.url}/robots.txt'
         result_data_set, status = self.driver.get_robots(url)
         if status:
