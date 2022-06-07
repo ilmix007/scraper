@@ -40,7 +40,7 @@ class Offer:
 
 
 class BaseDriver:
-    """Фасад для работы с сайтом"""
+    """Базовый класс драйверов"""
 
     def __init__(self):
         self.user_agent = USER_AGENTS[randint(0, len(USER_AGENTS) - 1)]
@@ -54,15 +54,17 @@ class BaseDriver:
             result = result.content.decode()
             result = result.replace('\r', '')
             for line in result.split("\n"):
-                result = result.replace('\r', '')
-                key = line.split(': ')[0].split(' ')[0]
-                value = line.split(': ')[1].split(' ')[0]
-                if key not in result_data_set.keys():
-                    result_data_set[key] = list()
-                result_data_set[key].append(value)
+                if len(line) > 0:
+                    if line[0] != '#':
+                        result = result.replace('\r', '')
+                        key = line.split(': ')[0].split(' ')[0]
+                        value = line.split(': ')[1].split(' ')[0]
+                        if key not in result_data_set.keys():
+                            result_data_set[key] = list()
+                        result_data_set[key].append(value)
             return result_data_set, True
         else:
-            LOGGER.error(f"Error receiving robots.txt {result}. User-agent: {self.user_agent}")
+            LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
             return dict(), False
 
     def _process_sitemap(self, soup):
@@ -93,8 +95,8 @@ class BaseDriver:
 
     def scrape(self, url) -> list[Offer]:
         """Возвращает список офферов"""
-        pass
+        return list()
 
     def get_shops(self, url) -> list[Shop]:
         """Возвращает список магазинов"""
-        pass
+        return list()
