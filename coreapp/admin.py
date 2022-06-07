@@ -85,13 +85,17 @@ class SiteAdmin(admin.ModelAdmin):
         for site in queryset:
             site_facade = SiteFacade(site)
             handler = Driver(site_facade)
-            handler.read_sitemap()
+            created, updated = handler.read_sitemap()
+        self.message_user(request, f"Created: {created}, updated: {updated}", messages.SUCCESS)
 
     @admin.action(description='Очистить ссылки сайта')
     def clear_urls(self, request, queryset):
+        total_count = 0
         for site in queryset:
             site_facade = SiteFacade(site)
-            site_facade.clear_urls()
+            deleted = site_facade.clear_urls()
+            total_count += deleted[0]
+        self.message_user(request, f"{total_count} entries deleted", messages.SUCCESS)
 
 
 @admin.register(SiteParameter)

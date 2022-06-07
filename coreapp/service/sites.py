@@ -28,10 +28,17 @@ class SiteFacade:
                                                                defaults={'key': key, 'value': val, 'site': self.site})
 
     def create_urls(self, urlset):
+        created = 0
+        updated = 0
         for url_loc in urlset:
-            Url.objects.get_or_create(link=url_loc.findNext("loc").text,
-                                      site=self.site,
-                                      defaults={'link': url_loc.findNext("loc").text, 'site': self.site})
+            _, status = Url.objects.update_or_create(link=url_loc.findNext("loc").text,
+                                                     site=self.site,
+                                                     defaults={'link': url_loc.findNext("loc").text, 'site': self.site})
+            if status:
+                created += 1
+            else:
+                updated += 1
+        return created, updated
 
     def get_urls(self, keys: list):
         keys = ParameterKey.objects.filter(title__in=keys)
@@ -42,4 +49,4 @@ class SiteFacade:
         return urlparse(self.url).netloc
 
     def clear_urls(self):
-        self.site.urls.all().delete()
+        return self.site.urls.all().delete()
