@@ -77,15 +77,20 @@ class SiteAdmin(admin.ModelAdmin):
                 fail_sites.append(site.title)
                 LOGGER.warning(f'Failure get robots.txt for {site.title}')
         self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt {success_sites}\n"
-                                   f"Не прочитано: {fail_sites}",
-                          messages.SUCCESS)
+                                   f"Не прочитано: {fail_sites}", messages.SUCCESS)
 
     @admin.action(description='Прочитать sitemap')
     def read_sitemap(self, request, queryset):
+        created, updated = 0, 0
+        LOGGER.warning(f'Start read sitemap')
         for site in queryset:
+            print(f'Start read sitemap {site.title}')
             site_facade = SiteFacade(site)
             handler = Driver(site_facade)
-            created, updated = handler.read_sitemap()
+            try:
+                created, updated = handler.read_sitemap()
+            except Exception as ex:
+                LOGGER.warning(f'Failure get sitemap for {site.title}. Exception {ex}')
         self.message_user(request, f"Created: {created}, updated: {updated}", messages.SUCCESS)
 
     @admin.action(description='Очистить ссылки сайта')

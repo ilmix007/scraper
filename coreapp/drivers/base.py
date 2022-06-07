@@ -67,19 +67,22 @@ class BaseDriver:
                     result_data_set[key].append(value)
         return result_data_set
 
-    def get_robots(self, url: str):
+    def _request(self, url):
         try:
-            result = requests.get(url, headers=self.headers)
+            return requests.get(url, headers=self.headers)
         except Exception as ex:
-            LOGGER.warning(f"Error 1 attempt receiving robots.txt. Exception: {ex}")
-            result = requests.get(url, headers=self.headers, verify=False)
-            if result.status_code == 200:
-                result_data_set = self.process_robots(result.content.decode())
-                return result_data_set, True
-        else:
-            if result.status_code == 200:
-                result_data_set = self.process_robots(result.content.decode())
-                return result_data_set, True
+            LOGGER.warning(f"Error 1 attempt requests. Exception: {ex}")
+        try:
+            return requests.get(url, headers=self.headers, verify=False)
+        except Exception as ex:
+            LOGGER.warning(f"Error 2 attempt requests. Exception: {ex}")
+            return False
+
+    def get_robots(self, url: str):
+        result = self._request(url)
+        if result.status_code == 200:
+            result_data_set = self.process_robots(result.content.decode())
+            return result_data_set, True
         LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
         return dict(), False
 
@@ -89,7 +92,7 @@ class BaseDriver:
         sitemap_tags = soup.find_all("sitemap")
         for sitemap in sitemap_tags:
             url = sitemap.findNext("loc").text
-            result = requests.get(url, headers=self.headers)
+            result = self._request(url)
             if result.status_code == 200:
                 soup = BeautifulSoup(result.content, features='xml')
                 result_urls.extend(self._process_sitemap(soup))
@@ -101,7 +104,7 @@ class BaseDriver:
     def get_urls_from_sitemap(self, sitemap_urls):
         """Возвращает ссылки с sitemap"""
         for url in sitemap_urls:
-            result = requests.get(url, headers=self.headers)
+            result = self._request(url)
             if result.status_code == 200:
                 soup = BeautifulSoup(result.content, features='xml')
                 return self._process_sitemap(soup)
