@@ -64,9 +64,15 @@ class SiteAdmin(admin.ModelAdmin):
         for site in queryset:
             site_facade = SiteFacade(site)
             handler = Driver(site_facade)
-            if handler.read_robots():
+            try:
+                result = handler.read_robots()
+            except Exception as ex:
+                LOGGER.error(f'handler.read_robots(). Exception {ex}')
+                continue
+            if result:
                 success_sites.append(site.title)
-
+            else:
+                LOGGER.warning(f'Failure get robots.txt for {site.title}')
         self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt {success_sites}",
                           messages.SUCCESS)
 
