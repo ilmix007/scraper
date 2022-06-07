@@ -1,3 +1,4 @@
+from coreapp.drivers.base import BaseDriver
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
 import logging
@@ -10,7 +11,10 @@ class Driver:
     def __init__(self, site: SiteFacade):
         self.site = site
         self.drive_class = self._get_drive_class()
-        self.driver = self.drive_class()
+        if self.drive_class:
+            self.driver = self.drive_class()
+        else:
+            self.driver = BaseDriver()
 
     def _get_drive_class(self):
         return DRIVER_CONF.get(self.site.get_domain())
