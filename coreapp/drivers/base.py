@@ -2,8 +2,8 @@ from random import randint
 import requests
 from bs4 import BeautifulSoup
 import logging
-
 from coreapp.drivers.user_agents import USER_AGENTS
+from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver']
@@ -47,25 +47,41 @@ class BaseDriver:
         self.headers = {'User-Agent': self.user_agent}
         self.soup = None
 
-    def get_robots(self, url):
+    def process_robots(self, robots_txt):
         result_data_set = dict()
-        result = requests.get(url, headers=self.headers)
-        if result.status_code == 200:
-            result = result.content.decode()
-            result = result.replace('\r', '')
-            for line in result.split("\n"):
-                if len(line) > 0:
-                    if line[0] != '#':
-                        result = result.replace('\r', '')
-                        key = line.split(': ')[0].split(' ')[0]
-                        value = line.split(': ')[1].split(' ')[0]
-                        if key not in result_data_set.keys():
-                            result_data_set[key] = list()
-                        result_data_set[key].append(value)
-            return result_data_set, True
+        robots_txt = robots_txt.replace('\r', '')
+        robots_txt = robots_txt.replace('\t', '')
+        robots_arr = robots_txt.split()
+        if len(robots_arr) > 0:
+            if len(robots_arr[0]) > 30 and len(robots_arr) < 2:
+                for item in settings.ROBOT_KEYS:
+                    robots_txt = robots_txt.replace(f' {item}', f'\n{item}')
+        for line in robots_txt.split("\n"):
+            if len(line) > 0:
+                if line[0] != '#':
+                    robots_txt = robots_txt.replace('\r', '')
+                    key = line.split(': ')[0].split(' ')[0]
+                    value = line.split(': ')[1].split(' ')[0]
+                    if key not in result_data_set.keys():
+                        result_data_set[key] = list()
+                    result_data_set[key].append(value)
+        return result_data_set
+
+    def get_robots(self, url):
+        try:
+            result = requests.get(url, headers=self.headers)
+        except Exception as ex:
+            LOGGER.warning(f"Error 1 attempt receiving robots.txt. Exception: {ex}")
+            result = requests.get(url, headers=self.headers, verify=False)
+            if result.status_code == 200:
+                result_data_set = self.process_robots(result.content.decode())
+                return result_data_set, True
         else:
-            LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
-            return dict(), False
+            if result.status_code == 200:
+                result_data_set = self.process_robots(result.content.decode())
+                return result_data_set, True
+        LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
+        return dict(), False
 
     def _process_sitemap(self, soup):
         """Рекурсивная функция обработки sitemap"""
