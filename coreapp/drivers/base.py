@@ -95,11 +95,11 @@ class BaseDriver:
                 result_urls.extend(self._process_sitemap(soup))
             else:
                 LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
-            break
         result_urls.extend(soup.find_all("url"))
         return result_urls
 
     def get_urls_from_sitemap(self, sitemap_urls):
+        """Возвращает ссылки с sitemap"""
         for url in sitemap_urls:
             result = requests.get(url, headers=self.headers)
             if result.status_code == 200:
