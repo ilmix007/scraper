@@ -7,6 +7,8 @@ __all__ = ['BaseDriver']
 
 
 class Shop:
+    """Магазин"""
+
     def __init__(self, url, phone, name='', address='', city=''):
         self.name = name
         self.address = address
@@ -16,6 +18,8 @@ class Shop:
 
 
 class Product:
+    """Товар"""
+
     def __init__(self, name, brand='', article=''):
         self.name = name
         self.brand = brand
@@ -23,18 +27,13 @@ class Product:
 
 
 class Offer:
+    """Товарное предложение"""
+
     def __init__(self, product, shop, url, count=0):
         self.product = product
         self.count = count
         self.shop = shop
         self.url = url
-
-
-class ScrabeResult:
-    def __init__(self, products: list[Product], shops: list[Shop], offers: list[Offer]):
-        self.products = products
-        self.shops = shops
-        self.offers = offers
 
 
 class BaseDriver:
