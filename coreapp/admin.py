@@ -61,19 +61,23 @@ class SiteAdmin(admin.ModelAdmin):
     @admin.action(description='Прочитать robots.txt')
     def read_robots(self, request, queryset):
         success_sites = list()
+        fail_sites = list()
         for site in queryset:
             site_facade = SiteFacade(site)
             handler = Driver(site_facade)
             try:
                 result = handler.read_robots()
             except Exception as ex:
-                LOGGER.error(f'handler.read_robots(). Exception {ex}')
+                LOGGER.error(f'handler.read_robots(). Exception: {ex}')
+                fail_sites.append(site.title)
                 continue
             if result:
                 success_sites.append(site.title)
             else:
+                fail_sites.append(site.title)
                 LOGGER.warning(f'Failure get robots.txt for {site.title}')
-        self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt {success_sites}",
+        self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt {success_sites}\n"
+                                   f"Не прочитано: {fail_sites}",
                           messages.SUCCESS)
 
     @admin.action(description='Прочитать sitemap')
