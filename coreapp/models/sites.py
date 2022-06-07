@@ -14,6 +14,9 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
         verbose_name = 'Ссылка'
         verbose_name_plural = 'Ссылки'
 
+    def set_schema(self):
+        self.link = self.link.replace('http://', 'https://', 1)
+
 
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
@@ -38,6 +41,9 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
     class Meta:
         verbose_name = 'Сайт'
         verbose_name_plural = 'Сайты'
+
+    def set_schema(self):
+        self.url = self.url.replace('http://', 'https://', 1)
 
 
 class ParameterKey(models.Model):
