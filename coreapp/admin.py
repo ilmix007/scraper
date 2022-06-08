@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html
+
 from coreapp.drivers.driver import Driver
 from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Url
 from django.contrib import messages
@@ -11,10 +13,13 @@ LOGGER = logging.getLogger(__name__)
 
 @admin.register(Url)
 class UrlAdmin(admin.ModelAdmin):
-    list_display = ['link', 'site', 'last_processing']
+    list_display = ['link', 'to_link', 'site', 'last_processing']
     search_fields = ['link', 'site']
     list_filter = ['site']
     raw_id_fields = ['site']
+
+    def to_link(self, obj):
+        return format_html('<a href="{}" target="_blank">ссылка</a>'.format(obj.link))
 
 
 @admin.register(Product)
@@ -84,7 +89,7 @@ class SiteAdmin(admin.ModelAdmin):
         created, updated = 0, 0
         LOGGER.warning(f'Start read sitemap')
         for site in queryset:
-            print(f'Start read sitemap {site.title}')
+            LOGGER.info(f'Start read sitemap {site.title}')
             site_facade = SiteFacade(site)
             handler = Driver(site_facade)
             try:
