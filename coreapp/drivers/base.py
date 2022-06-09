@@ -9,6 +9,24 @@ LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver']
 
 
+class TypeLink:
+    """ Типы ссылок """
+
+    def __init__(self, product: bool = False, shop: bool = False, img: bool = False):
+        self.product = product
+        self.shop = shop
+        self.img = img
+
+
+class Link:
+    """ Ссылка """
+
+    def __init__(self, url, alt='', type_link: TypeLink = TypeLink()):
+        self.url = url
+        self.alt = alt
+        self.type_link = type_link
+
+
 class Shop:
     """Магазин"""
 
