@@ -23,7 +23,7 @@ class TypeLink:
 class Link:
     """ Ссылка """
 
-    def __init__(self, url, alt='', type_link: TypeLink = TypeLink()):
+    def __init__(self, url, alt: str = '', type_link: TypeLink = TypeLink()):
         self.url = url
         self.alt = alt
         self.type_link = type_link
