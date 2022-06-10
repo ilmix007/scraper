@@ -1,4 +1,6 @@
 from random import randint
+from typing import List
+
 import requests
 from bs4 import BeautifulSoup
 import logging
@@ -38,23 +40,33 @@ class Shop:
         self.city = city
 
 
+class Parameter:
+    """Параметры товара"""
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+
 class Product:
     """Товар"""
 
-    def __init__(self, name, brand='', article=''):
+    def __init__(self, name, brand='', article='', parameters: List[Parameter] = list()):
         self.name = name
         self.brand = brand
         self.article = article
+        self.parameters = parameters
 
 
 class Offer:
     """Товарное предложение"""
 
-    def __init__(self, product, shop, url, count=0):
+    def __init__(self, product: Product, shop: Shop, url: Link, images: List[Link] = list(), count=0):
         self.product = product
         self.count = count
         self.shop = shop
         self.url = url
+        self.images = images
 
 
 class BaseDriver:
@@ -120,7 +132,7 @@ class BaseDriver:
         return result_urls
 
     def get_urls_from_sitemap(self, sitemap_urls):
-        """Возвращает ссылки с sitemap"""
+        """Возвращает ссылки из sitemap"""
         for url in sitemap_urls:
             result = self._request(url)
             if result.status_code == 200:
@@ -130,9 +142,9 @@ class BaseDriver:
                 LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
                 return False
 
-    def scrape(self, url) -> list[Offer]:
-        """Возвращает список офферов"""
-        return list()
+    def scrape(self, url) -> (list[Offer], list[Link]):
+        """Возвращает список оферов"""
+        return list(), list()
 
     def get_shops(self, url) -> list[Shop]:
         """Возвращает список магазинов"""
