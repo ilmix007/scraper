@@ -21,6 +21,30 @@ class UrlAdmin(admin.ModelAdmin):
     def to_link(self, obj):
         return format_html('<a href="{}" target="_blank">ссылка</a>'.format(obj.link))
 
+    actions = ['scrape']
+
+    @admin.action(description='Парсить')
+    def scrape(self, request, queryset):
+        success_urls = list()
+        fail_urls = list()
+        for url in queryset:
+            site_facade = SiteFacade(url.site)
+            handler = Driver(site_facade)
+            status, result = handler.scrape(url.link)
+            if status:
+                success_urls.append(url.site.title)
+            else:
+                fail_urls.append(url.site.title)
+                LOGGER.error(f'Failure scrape for {url.site.title}. Exception: {result}')
+        if len(success_urls) > 0 and len(fail_urls) == 0:
+            self.message_user(request, f"Успешно {len(success_urls)}", messages.SUCCESS)
+        elif len(success_urls) == 0 and len(fail_urls) != 0:
+            self.message_user(request, f"Ошибка {len(fail_urls)}", messages.ERROR)
+        else:
+            message = messages.WARNING
+            self.message_user(request, f"Успешно {len(success_urls)}\n"
+                                       f"Ошибка {len(fail_urls)} : {fail_urls}", message)
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
