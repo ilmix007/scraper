@@ -81,8 +81,14 @@ class SiteAdmin(admin.ModelAdmin):
             else:
                 fail_sites.append(site.title)
                 LOGGER.warning(f'Failure get robots.txt for {site.title}')
-        self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt {success_sites}\n"
-                                   f"Не прочитано: {fail_sites}", messages.SUCCESS)
+        if len(success_sites) > 0 and len(fail_sites) == 0:
+            self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt", messages.SUCCESS)
+        elif len(success_sites) == 0 and len(fail_sites) != 0:
+            self.message_user(request, f"Ошибка прочтения {len(fail_sites)} robots.txt", messages.ERROR)
+        else:
+            message = messages.WARNING
+            self.message_user(request, f"Успешно прочитан(о) {len(success_sites)} robots.txt\n"
+                                       f"Не прочитано {len(fail_sites)} : {fail_sites}", message)
 
     @admin.action(description='Прочитать sitemap')
     def read_sitemap(self, request, queryset):
