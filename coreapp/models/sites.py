@@ -2,6 +2,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin
+from urllib.parse import urlparse
 
 
 class Url(CreatedMixin, UpdatedMixin, models.Model):
@@ -16,6 +17,10 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
 
     def set_schema(self):
         self.link = self.link.replace('http://', 'https://', 1)
+
+    @property
+    def domain(self):
+        return urlparse(self.link).netloc.replace('www.', '', 1)
 
 
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
