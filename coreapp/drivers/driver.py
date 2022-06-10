@@ -1,4 +1,6 @@
-from coreapp.drivers.base import BaseDriver
+from typing import List
+
+from coreapp.drivers.base import BaseDriver, ScrapeResult
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
 import logging
@@ -35,3 +37,10 @@ class Driver:
         if urls:
             created, updated = self.site.create_urls(urls)
         return created, updated
+
+    def scrape(self, url) -> (bool, List[ScrapeResult] or Exception):
+        try:
+            result = self.driver.scrape(url)
+            return True, result
+        except Exception as ex:
+            return False, ex
