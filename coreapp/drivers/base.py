@@ -8,7 +8,7 @@ from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
-__all__ = ['BaseDriver']
+__all__ = ['BaseDriver', 'ScrapeResult']
 
 
 class TypeLink:
@@ -67,6 +67,14 @@ class Offer:
         self.shop = shop
         self.url = url
         self.images = images
+
+
+class ScrapeResult:
+    """Результат веб-скрапинга"""
+
+    def __init__(self, offers: List[Offer] = list(), links: List[Link] = list()):
+        self.offers = offers
+        self.links = links
 
 
 class BaseDriver:
@@ -142,9 +150,9 @@ class BaseDriver:
                 LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
                 return False
 
-    def scrape(self, url) -> (list[Offer], list[Link]):
+    def scrape(self, url) -> list[ScrapeResult]:
         """Возвращает список оферов"""
-        return list(), list()
+        return list()
 
     def get_shops(self, url) -> list[Shop]:
         """Возвращает список магазинов"""
