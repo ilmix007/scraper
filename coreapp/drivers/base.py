@@ -6,12 +6,11 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
 
-CHROME_PATH = '/usr/bin/google-chrome'
-WINDOW_SIZE = "1920,1080"
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver', 'ScrapeResult']
@@ -163,13 +162,13 @@ class BaseDriver:
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
-        wd = webdriver.Chrome(executable_path=settings.CELENIUM_PATH, chrome_options=chrome_options)
+        chrome_options.add_argument("--window-size=%s" % settings.WINDOW_SIZE)
+        service = Service(executable_path=settings.CHROME_PATH)
+        wd = webdriver.Chrome(options=chrome_options, service=service)
         wd.get(url)
         html = wd.page_source
         wd.quit()
         soup = BeautifulSoup(html)
-        # soup = BeautifulSoup(url, 'html.parser')
         link = Link(url)
         return self.parse(soup, link)
 
