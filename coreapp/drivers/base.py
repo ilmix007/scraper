@@ -1,11 +1,16 @@
 from random import randint
 from typing import List
-
+from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
 import logging
+from selenium.webdriver.chrome.options import Options
+
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
+
+CHROME_PATH = '/usr/bin/google-chrome'
+WINDOW_SIZE = "1920,1080"
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver', 'ScrapeResult']
@@ -107,7 +112,9 @@ class BaseDriver:
 
     def _request(self, url):
         try:
-            return requests.get(url, headers=self.headers)
+            result = requests.get(url, headers=self.headers)
+            if result.status_code == 200:
+                return result
         except Exception as ex:
             LOGGER.warning(f"Error 1 attempt requests. Exception: {ex}")
         try:
@@ -150,8 +157,33 @@ class BaseDriver:
                 LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
                 return False
 
-    def scrape(self, url) -> list[ScrapeResult]:
+    def scrape(self, url: str) -> list[ScrapeResult]:
         """Возвращает список оферов"""
+        LOGGER.debug(f"Start {self.__class__}.scrape()")
+        # print(url)
+        # # self.headers.update({'Connection': 'keep - alive'})
+        # print(self.headers)
+        # result = self._request(url)
+        # print('result')
+        # print(result)
+        # print(result.status_code)
+        # print(result.content)
+        # soup = BeautifulSoup(url, 'html.parser')
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
+
+        wd = webdriver.Chrome(executable_path=settings.CELENIUM_PATH, chrome_options=chrome_options)
+        wd.get(url)
+        html = wd.page_source
+        wd.quit()
+        soup = BeautifulSoup(html)
+        tables = soup.findAll('table', {"class": "product-card__properties"})
+        for table in tables:
+            properties = table.findAll('tr')
+            for prop in properties:
+                print(type(prop))
+
         return list()
 
     def get_shops(self, url) -> list[Shop]:
