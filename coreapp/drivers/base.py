@@ -174,10 +174,8 @@ class BaseDriver:
         return self.parse(soup, link)
 
     def parse(self, soup: BeautifulSoup, link: Link = None) -> ScrapeResult:
-        result = list()
-        if link is None:
-            # определить тип страницы
-            pass
+        if not any([link.type_link.product, link.type_link.shop, link.type_link.img]):
+            link = self.parse_link_type(soup, link)
         if link.type_link.product:
             offers = self.parse_offers(soup, link)
         else:
