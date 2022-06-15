@@ -1,3 +1,4 @@
+import time
 from random import randint
 from typing import List
 from selenium import webdriver
@@ -157,35 +158,48 @@ class BaseDriver:
                 LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
                 return False
 
-    def scrape(self, url: str) -> list[ScrapeResult]:
+    def scrape(self, url: str) -> ScrapeResult:
         """Возвращает список оферов"""
         LOGGER.debug(f"Start {self.__class__}.scrape()")
-        # print(url)
-        # # self.headers.update({'Connection': 'keep - alive'})
-        # print(self.headers)
-        # result = self._request(url)
-        # print('result')
-        # print(result)
-        # print(result.status_code)
-        # print(result.content)
-        # soup = BeautifulSoup(url, 'html.parser')
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
-
         wd = webdriver.Chrome(executable_path=settings.CELENIUM_PATH, chrome_options=chrome_options)
         wd.get(url)
         html = wd.page_source
         wd.quit()
         soup = BeautifulSoup(html)
-        tables = soup.findAll('table', {"class": "product-card__properties"})
-        for table in tables:
-            properties = table.findAll('tr')
-            for prop in properties:
-                print(type(prop))
+        # soup = BeautifulSoup(url, 'html.parser')
+        link = Link(url)
+        return self.parse(soup, link)
 
+    def parse(self, soup: BeautifulSoup, link: Link = None) -> ScrapeResult:
+        result = list()
+        if link is None:
+            # определить тип страницы
+            pass
+        if link.type_link.product:
+            offers = self.parse_offers(soup, link)
+        else:
+            offers = list()
+        if link.type_link.shop:
+            shops = self.parse_shops(soup, link)
+        links = self.parse_links(soup, link)
+        result = ScrapeResult(offers, links)
+        return result
+
+    def parse_link_type(self, soup: BeautifulSoup, link: Link) -> Link:
+        """Обновляет тип ссылки"""
+        return link
+
+    def parse_offers(self, soup: BeautifulSoup, link: Link) -> List[Offer]:
+        """Возвращает список оферов"""
         return list()
 
-    def get_shops(self, url) -> list[Shop]:
+    def parse_links(self, soup: BeautifulSoup, link: Link) -> List[Link]:
+        """Возвращает список ссылок"""
+        return list()
+
+    def parse_shops(self, soup: BeautifulSoup, link: Link) -> List[Shop]:
         """Возвращает список магазинов"""
         return list()
