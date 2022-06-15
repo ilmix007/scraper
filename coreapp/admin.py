@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from coreapp.drivers.driver import Driver
+from coreapp.drivers.handler import Handler
 from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Url
 from django.contrib import messages
 import logging
@@ -29,7 +29,7 @@ class UrlAdmin(admin.ModelAdmin):
         fail_urls = list()
         for url in queryset:
             site_facade = SiteFacade(url.site)
-            handler = Driver(site_facade)
+            handler = Handler(site_facade)
             status, result = handler.scrape(url.link)
             if status:
                 success_urls.append(url.site.title)
@@ -93,7 +93,7 @@ class SiteAdmin(admin.ModelAdmin):
         fail_sites = list()
         for site in queryset:
             site_facade = SiteFacade(site)
-            handler = Driver(site_facade)
+            handler = Handler(site_facade)
             try:
                 result = handler.read_robots()
             except Exception as ex:
@@ -121,7 +121,7 @@ class SiteAdmin(admin.ModelAdmin):
         for site in queryset:
             LOGGER.info(f'Start read sitemap {site.title}')
             site_facade = SiteFacade(site)
-            handler = Driver(site_facade)
+            handler = Handler(site_facade)
             try:
                 created, updated = handler.read_sitemap()
             except Exception as ex:

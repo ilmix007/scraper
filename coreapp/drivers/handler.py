@@ -6,10 +6,10 @@ from coreapp.service.sites import SiteFacade
 import logging
 
 LOGGER = logging.getLogger(__name__)
-__all__ = ['Driver']
+__all__ = ['Handler']
 
 
-class Driver:
+class Handler:
     def __init__(self, site: SiteFacade):
         self.site = site
         self.drive_class = self._get_drive_class()
