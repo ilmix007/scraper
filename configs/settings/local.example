@@ -13,3 +13,4 @@ DATABASES = {
         'HOST': '',
     }
 }
+CHROME_PATH = ''
