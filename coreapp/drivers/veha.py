@@ -21,6 +21,8 @@ class Veha(BaseDriver):
             return link
         if len(re.findall(r'/catalog/product/\d*', link.url)) > 0:
             link.type_link.product = True
+        if '/kontakty/' in link.url:
+            link.type_link.shop = True
         return link
 
     def get_price(self, soup: BeautifulSoup) -> int:
