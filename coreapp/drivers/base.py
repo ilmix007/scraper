@@ -12,7 +12,7 @@ from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
-__all__ = ['BaseDriver', 'ScrapeResult']
+__all__ = ['BaseDriver', 'ScrapeResult', 'Link', 'Shop', 'Parameter', 'Product', 'Offer']
 
 
 class TypeLink:
