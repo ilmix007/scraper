@@ -11,7 +11,6 @@ from selenium.webdriver.chrome.service import Service
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
 
-
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver', 'ScrapeResult']
 
@@ -77,9 +76,10 @@ class Offer:
 class ScrapeResult:
     """Результат веб-скрапинга"""
 
-    def __init__(self, offers: List[Offer] = list(), links: List[Link] = list()):
+    def __init__(self, offers: List[Offer] = list(), links: List[Link] = list(), shops: List[Shop] = list()):
         self.offers = offers
         self.links = links
+        self.shops = shops
 
 
 class BaseDriver:
@@ -162,7 +162,6 @@ class BaseDriver:
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=%s" % settings.WINDOW_SIZE)
         service = Service(executable_path=settings.CHROME_PATH)
         wd = webdriver.Chrome(options=chrome_options, service=service)
         wd.get(url)
