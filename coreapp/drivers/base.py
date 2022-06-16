@@ -36,12 +36,16 @@ class Link:
 class Shop:
     """Магазин"""
 
-    def __init__(self, url, phone, name='', address='', city=''):
+    def __init__(self, url='', phone='', name='', address='', city='', shop_param=''):
         self.name = name
         self.address = address
         self.phone = phone
         self.url = url
         self.city = city
+        self.shop_param = shop_param
+
+    def __str__(self):
+        return self.name
 
 
 class Parameter:
@@ -65,7 +69,7 @@ class Product:
 class Offer:
     """Товарное предложение"""
 
-    def __init__(self, product: Product, price: int,  shop: Shop, url: Link, images: List[Link] = list(), count=0):
+    def __init__(self, product: Product, price: int, shop: Shop, url: Link, images: List[Link] = list(), count=0):
         self.product = product
         self.count = count
         self.price = price
