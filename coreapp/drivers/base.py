@@ -167,7 +167,7 @@ class BaseDriver:
         wd.get(url)
         html = wd.page_source
         wd.quit()
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html, 'lxml')
         link = Link(url)
         return self.parse(soup, link)
 
@@ -180,8 +180,10 @@ class BaseDriver:
             offers = list()
         if link.type_link.shop:
             shops = self.parse_shops(soup, link)
+        else:
+            shops = list()
         links = self.parse_links(soup, link)
-        result = ScrapeResult(offers, links)
+        result = ScrapeResult(offers, links, shops)
         return result
 
     def parse_link_type(self, soup: BeautifulSoup, link: Link) -> Link:
