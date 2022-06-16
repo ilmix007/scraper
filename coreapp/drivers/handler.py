@@ -1,5 +1,5 @@
 from typing import List
-
+from django.conf import settings
 from coreapp.drivers.base import BaseDriver, ScrapeResult
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
@@ -39,8 +39,12 @@ class Handler:
         return created, updated
 
     def scrape(self, url) -> (bool, List[ScrapeResult] or Exception):
-        try:
+        if settings.DEBUG:
             result = self.driver.scrape(url)
             return True, result
-        except Exception as ex:
-            return False, ex
+        else:
+            try:
+                result = self.driver.scrape(url)
+                return True, result
+            except Exception as ex:
+                return False, ex
