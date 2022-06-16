@@ -65,9 +65,10 @@ class Product:
 class Offer:
     """Товарное предложение"""
 
-    def __init__(self, product: Product, shop: Shop, url: Link, images: List[Link] = list(), count=0):
+    def __init__(self, product: Product, price: int,  shop: Shop, url: Link, images: List[Link] = list(), count=0):
         self.product = product
         self.count = count
+        self.price = price
         self.shop = shop
         self.url = url
         self.images = images
