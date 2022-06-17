@@ -14,9 +14,9 @@ __all__ = ['Handler']
 class Handler:
     def __init__(self, site: SiteFacade):
         self.site = site
-        self.drive_class = DRIVER_CONF.get(self.site.get_domain())
-        if self.drive_class:
-            self.driver = self.drive_class()
+        drive_class = DRIVER_CONF.get(self.site.get_domain())
+        if drive_class:
+            self.driver = drive_class()
         else:
             self.driver = Driver()
 
