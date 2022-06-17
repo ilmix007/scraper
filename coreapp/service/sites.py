@@ -50,3 +50,13 @@ class SiteFacade:
 
     def clear_urls(self):
         return self.site.urls.all().delete()
+
+    # def update_shops(self, shops:List[Shop]):
+    #     for shop in shops:
+    #         obj, created = Shop.objects.update_or_create(
+    #             name,
+    #         address,
+    #         phone =,
+    #         site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
+    #         getparam
+    #         )
