@@ -53,13 +53,13 @@ class OfferData:
     """Товарное предложение"""
     shop: ShopData
     link: LinkData
+    images: List
+    parameters: List
+    count: int = 0
     name: str = ''
     brand: str = ''
     article: str = ''
-    count: int = 0
     price: float = 0
-    # images: List[LinkData] = field(default_factory=[Any()])
-    # parameters: List[ParameterData] = field(default_factory=[])
 
 
 class ScrapeResult:
