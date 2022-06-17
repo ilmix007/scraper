@@ -79,7 +79,7 @@ class SiteParameter(models.Model):
 class Shop(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
     address = models.CharField(verbose_name='Адрес', unique=True, max_length=255)
-    phone = PhoneNumberField(null=False, blank=False, unique=True)
+    phone = PhoneNumberField(null=True, blank=True, unique=True)
     site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
     getparam = models.CharField(verbose_name='Get-параметр', max_length=63, null=True, blank=True)
 
