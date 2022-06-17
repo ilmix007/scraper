@@ -82,6 +82,7 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
     address = models.CharField(verbose_name='Адрес', unique=True, max_length=255)
     phone = PhoneNumberField(null=False, blank=False, unique=True)
     site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
+    getparam = models.CharField(verbose_name='Get-параметр', max_length=63, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -90,13 +91,3 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'
 
-
-class GetParameter(models.Model):
-    site = models.ForeignKey(Site, verbose_name='Сайт', on_delete=models.CASCADE)
-    shop = models.ForeignKey(Shop, verbose_name='Магазин', on_delete=models.CASCADE)
-    param = models.CharField(verbose_name='Параметр', max_length=63)
-
-    class Meta:
-        verbose_name = 'Get-параметры'
-        verbose_name_plural = 'Get-параметры'
-        unique_together = ('site', 'shop')
