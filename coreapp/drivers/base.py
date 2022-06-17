@@ -1,6 +1,7 @@
 import time
+from abc import ABC, abstractmethod
 from random import randint
-from typing import List
+from typing import List, Dict, Any
 from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
@@ -10,92 +11,128 @@ from selenium.webdriver.chrome.service import Service
 
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
+from dataclasses import dataclass, field
 
 LOGGER = logging.getLogger(__name__)
-__all__ = ['BaseDriver', 'ScrapeResult', 'Link', 'Shop', 'Parameter', 'Product', 'Offer']
+__all__ = ['BaseDriver', 'Driver', 'ScrapeResult', 'LinkData', 'ShopData', 'ParameterData', 'OfferData']
 
 
-class TypeLink:
-    """ Типы ссылок """
-
-    def __init__(self, product: bool = False, shop: bool = False, img: bool = False):
-        self.product = product
-        self.shop = shop
-        self.img = img
-
-
-class Link:
-    """ Ссылка """
-
-    def __init__(self, url, alt: str = '', type_link: TypeLink = TypeLink()):
-        self.url = url
-        self.alt = alt
-        self.type_link = type_link
+@dataclass
+class LinkData:
+    """Параметры ссылки"""
+    url: str
+    alt: str = ''
+    product: bool = False
+    shop: bool = False
+    img: bool = False
 
 
-class Shop:
+@dataclass
+class ShopData:
     """Магазин"""
-
-    def __init__(self, url='', phone='', name='', address='', city='', shop_param=''):
-        self.name = name
-        self.address = address
-        self.phone = phone
-        self.url = url
-        self.city = city
-        self.shop_param = shop_param
+    name: str
+    city: str
+    address: str = ''
+    phone: str = ''
+    url: str = ''
+    shop_param: str = ''
 
     def __str__(self):
         return self.name
 
 
-class Parameter:
+@dataclass
+class ParameterData:
     """Параметры товара"""
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
+    name: str
+    value: str
 
 
-class Product:
-    """Товар"""
-
-    def __init__(self, name, brand='', article='', parameters: List[Parameter] = list()):
-        self.name = name
-        self.brand = brand
-        self.article = article
-        self.parameters = parameters
-
-
-class Offer:
+@dataclass
+class OfferData:
     """Товарное предложение"""
-
-    def __init__(self, product: Product, price: int, shop: Shop, url: Link, images: List[Link] = list(), count=0):
-        self.product = product
-        self.count = count
-        self.price = price
-        self.shop = shop
-        self.url = url
-        self.images = images
+    shop: ShopData
+    link: LinkData
+    name: str = ''
+    brand: str = ''
+    article: str = ''
+    count: int = 0
+    price: float = 0
+    # images: List[LinkData] = field(default_factory=[Any()])
+    # parameters: List[ParameterData] = field(default_factory=[])
 
 
 class ScrapeResult:
     """Результат веб-скрапинга"""
 
-    def __init__(self, offers: List[Offer] = list(), links: List[Link] = list(), shops: List[Shop] = list()):
+    def __init__(self, offers: List[OfferData] = list(), links: List[LinkData] = list(),
+                 shops: List[ShopData] = list()):
         self.offers = offers
         self.links = links
         self.shops = shops
 
 
-class BaseDriver:
-    """Базовый класс драйверов"""
+class BaseDriver(ABC):
+    """Базовый класс драйвера"""
 
     def __init__(self):
         self.user_agent = USER_AGENTS[randint(0, len(USER_AGENTS) - 1)]
         self.headers = {'User-Agent': self.user_agent}
-        self.soup = None
 
-    def process_robots(self, robots_txt: str) -> dict:
+    @abstractmethod
+    def get_offer(self, soup: BeautifulSoup) -> OfferData:
+        """Получить список оферов"""
+        pass
+
+    @abstractmethod
+    def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:
+        """Определить тип ссылки"""
+        pass
+
+    @abstractmethod
+    def get_links(self, soup: BeautifulSoup, link: LinkData) -> List[LinkData]:
+        """Возвращает список ссылок"""
+        pass
+
+    @abstractmethod
+    def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
+        """Получить список магазинов"""
+        pass
+
+    def get_soup(self, url: str) -> BeautifulSoup:
+        """Возвращает объект BeautifulSoup"""
+        LOGGER.debug(f"Start {self.__class__}.scrape()")
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        service = Service(executable_path=settings.CHROME_PATH)
+        wd = webdriver.Chrome(options=chrome_options, service=service)
+        wd.get(url)
+        html = wd.page_source
+        wd.quit()
+        soup = BeautifulSoup(html, 'lxml')
+        return soup
+
+    def get_robots(self, url: str) -> (Dict, bool):
+        result = self._request(url)
+        if result.status_code == 200:
+            result_data_set = self._process_robots(result.content.decode())
+            return result_data_set, True
+        LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
+        return dict(), False
+
+    def get_urls_from_sitemap(self, sitemap_urls) -> List:
+        """Возвращает ссылки из sitemap"""
+        for url in sitemap_urls:
+            result = self._request(url)
+            if result.status_code == 200:
+                soup = BeautifulSoup(result.content, features='xml')
+                return self._process_sitemap(soup)
+            else:
+                LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
+                return False
+
+    def _process_robots(self, robots_txt: str) -> dict:
+        """Обработать robots.txt"""
         result_data_set = dict()
         robots_txt = robots_txt.replace('\r', '')
         robots_txt = robots_txt.replace('\t', '')
@@ -128,14 +165,6 @@ class BaseDriver:
             LOGGER.warning(f"Error 2 attempt requests. Exception: {ex}")
             return False
 
-    def get_robots(self, url: str):
-        result = self._request(url)
-        if result.status_code == 200:
-            result_data_set = self.process_robots(result.content.decode())
-            return result_data_set, True
-        LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
-        return dict(), False
-
     def _process_sitemap(self, soup: BeautifulSoup) -> list:
         """Рекурсивная функция обработки sitemap"""
         result_urls = list()
@@ -151,58 +180,22 @@ class BaseDriver:
         result_urls.extend(soup.find_all("url"))
         return result_urls
 
-    def get_urls_from_sitemap(self, sitemap_urls):
-        """Возвращает ссылки из sitemap"""
-        for url in sitemap_urls:
-            result = self._request(url)
-            if result.status_code == 200:
-                soup = BeautifulSoup(result.content, features='xml')
-                return self._process_sitemap(soup)
-            else:
-                LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
-                return False
 
-    def scrape(self, url: str) -> ScrapeResult:
-        """Возвращает список оферов"""
-        LOGGER.debug(f"Start {self.__class__}.scrape()")
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        service = Service(executable_path=settings.CHROME_PATH)
-        wd = webdriver.Chrome(options=chrome_options, service=service)
-        wd.get(url)
-        html = wd.page_source
-        wd.quit()
-        soup = BeautifulSoup(html, 'lxml')
-        link = Link(url)
-        return self.parse(soup, link)
+class Driver(BaseDriver):
+    """Драйвер по умолчанию"""
 
-    def parse(self, soup: BeautifulSoup, link: Link = None) -> ScrapeResult:
-        if not any([link.type_link.product, link.type_link.shop, link.type_link.img]):
-            link = self.parse_link_type(soup, link)
-        if link.type_link.product:
-            offers = self.parse_offers(soup, link)
-        else:
-            offers = list()
-        if link.type_link.shop:
-            shops = self.parse_shops(soup, link)
-        else:
-            shops = list()
-        links = self.parse_links(soup, link)
-        result = ScrapeResult(offers, links, shops)
-        return result
+    def get_offer(self, soup: BeautifulSoup) -> OfferData:
+        """Получить список оферов"""
+        pass
 
-    def parse_link_type(self, soup: BeautifulSoup, link: Link) -> Link:
-        """Обновляет тип ссылки"""
-        return link
+    def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:
+        """Определить тип ссылки"""
+        pass
 
-    def parse_offers(self, soup: BeautifulSoup, link: Link) -> List[Offer]:
-        """Возвращает список оферов"""
-        return list()
-
-    def parse_links(self, soup: BeautifulSoup, link: Link) -> List[Link]:
+    def get_links(self, soup: BeautifulSoup, link: LinkData) -> List[LinkData]:
         """Возвращает список ссылок"""
-        return list()
+        pass
 
-    def parse_shops(self, soup: BeautifulSoup, link: Link) -> List[Shop]:
-        """Возвращает список магазинов"""
-        return list()
+    def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
+        """Получить список магазинов"""
+        pass
