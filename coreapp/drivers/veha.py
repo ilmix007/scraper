@@ -2,7 +2,7 @@ from typing import List
 
 from bs4 import BeautifulSoup
 import re
-from coreapp.drivers.base import BaseDriver, Link, Offer, Product, Parameter, Shop
+from coreapp.drivers.base import BaseDriver, LinkData, OfferData, ParameterData, ShopData
 
 import logging
 
@@ -11,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Veha(BaseDriver):
 
-    def parse_link_type(self, soup: BeautifulSoup, link: Link) -> Link:
+    def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:
         """Определяет тип ссылки"""
         page_404 = soup.findAll('div', class_='page-404', limit=1)
         if len(page_404) > 0:
@@ -25,7 +25,7 @@ class Veha(BaseDriver):
             link.type_link.shop = True
         return link
 
-    def get_price(self, soup: BeautifulSoup) -> int:
+    def _get_price(self, soup: BeautifulSoup) -> int:
         price = soup.findAll('div', class_='product-card__price')[0].text
         price = price.replace('\n', '').replace(' ', '')
         prices = re.findall(r'\d+\.\d+', price)
@@ -37,7 +37,7 @@ class Veha(BaseDriver):
                 return int(prices[0])
             return 0
 
-    def get_product(self, soup):
+    def _get_product(self, soup: BeautifulSoup) -> (str, str, str):
         h1 = soup.findAll('h1', class_="title-lg", limit=1)
         name = h1[0].contents[0]
         parameters = list()
@@ -53,19 +53,18 @@ class Veha(BaseDriver):
                     elif content.text == 'Производитель':
                         brand = tr.contents[index + 1]
                     elif index + 1 < len(tr.contents):
-                        parameters.append(Parameter(content.text, tr.contents[index + 1]))
-        product = Product(name, brand, article, parameters)
-        return product
+                        parameters.append(ParameterData(content.text, tr.contents[index + 1]))
+        return name, article, brand
 
-    def parse_offers(self, soup: BeautifulSoup, link: Link) -> List[Offer]:
-        """Возвращает список оферов"""
-        product = self.get_product(soup)
+    def get_offer(self, soup: BeautifulSoup) -> OfferData:
+        """Возвращает офер"""
+        name, article, brand = self._get_product(soup)
         price = self.get_price(soup)
-        shops = self.get_shops(soup)
-        # offer = Offer(product=product, price=0, count=0)
-        return list()
+        offer = OfferData(name=name, brand=brand, article=article, images=[], parameters=[],
+                          count=0, price=price)
+        return offer
 
-    def get_shops(self, soup: BeautifulSoup) -> List[Shop]:
+    def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
         # https://veha-corp.ru/shop_change/9/
         # ?change_city=15
         cities = soup.findAll('div', class_='shops-cities-popup__city-btn')
@@ -86,6 +85,10 @@ class Veha(BaseDriver):
             if len(ids) == 1:
                 city = city_dict[tabid]
                 name = f'{city} - {adr}'
-                shop = Shop(name=name, city=city, address=address, shop_param=f'?change_city={ids[0]}')
+                shop = ShopData(name=name, city=city, address=address, shop_param=f'?change_city={ids[0]}')
                 result.append(shop)
         return result
+
+    def get_links(self, soup: BeautifulSoup, link: LinkData) -> List[LinkData]:
+        """Возвращает список ссылок"""
+        pass
