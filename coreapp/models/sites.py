@@ -26,6 +26,7 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
     url = models.URLField(verbose_name='url', unique=True, max_length=255)
+    iterating = models.BooleanField(verbose_name='Парсить каждую страницу с разными параметрами', default=False)
     crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
     DEFAULT_TIMEOUT = 0.5
 
@@ -88,3 +89,14 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
     class Meta:
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'
+
+
+class GetParameter(models.Model):
+    site = models.ForeignKey(Site, verbose_name='Сайт', on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, verbose_name='Магазин', on_delete=models.CASCADE)
+    param = models.CharField(verbose_name='Параметр', max_length=63)
+
+    class Meta:
+        verbose_name = 'Get-параметры'
+        verbose_name_plural = 'Get-параметры'
+        unique_together = ('site', 'shop')
