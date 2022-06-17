@@ -26,7 +26,6 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
     url = models.URLField(verbose_name='url', unique=True, max_length=255)
-    iterating = models.BooleanField(verbose_name='Парсить каждую страницу с разными параметрами', default=False)
     crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
     DEFAULT_TIMEOUT = 0.5
 
