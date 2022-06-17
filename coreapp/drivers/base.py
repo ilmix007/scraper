@@ -22,7 +22,7 @@ class LinkData:
     """Параметры ссылки"""
     url: str
     alt: str = ''
-    product: bool = False
+    offer: bool = False
     shop: bool = False
     img: bool = False
 
@@ -185,7 +185,7 @@ class Driver(BaseDriver):
     """Драйвер по умолчанию"""
 
     def get_offer(self, soup: BeautifulSoup) -> OfferData:
-        """Получить список оферов"""
+        """Получить оффер"""
         pass
 
     def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:

@@ -1,6 +1,8 @@
 from typing import List
+
+from bs4 import BeautifulSoup
 from django.conf import settings
-from coreapp.drivers.base import BaseDriver, ScrapeResult
+from coreapp.drivers.base import Driver, ScrapeResult, LinkData
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
 import logging
@@ -12,14 +14,11 @@ __all__ = ['Handler']
 class Handler:
     def __init__(self, site: SiteFacade):
         self.site = site
-        self.drive_class = self._get_drive_class()
+        self.drive_class = DRIVER_CONF.get(self.site.get_domain())
         if self.drive_class:
             self.driver = self.drive_class()
         else:
-            self.driver = BaseDriver()
-
-    def _get_drive_class(self):
-        return DRIVER_CONF.get(self.site.get_domain())
+            self.driver = Driver()
 
     def read_robots(self) -> bool:
         url = f'{self.site.url}/robots.txt'
@@ -39,12 +38,26 @@ class Handler:
         return created, updated
 
     def scrape(self, url) -> (bool, List[ScrapeResult] or Exception):
+
         if settings.DEBUG:
-            result = self.driver.scrape(url)
-            return True, result
+            soup = self.driver.get_soup(url)
         else:
             try:
-                result = self.driver.scrape(url)
+                result = self.driver.get_soup(url)
                 return True, result
             except Exception as ex:
                 return False, ex
+        link = LinkData(url)
+        link = self.driver.get_link_type(soup, link)
+        if link.shop:
+            shops = self.driver.get_shops(soup, link)
+        else:
+            shops = list()
+        if link.offer:
+            offer = self.driver.get_offer(soup)
+            offers = [offer]
+        else:
+            offers = list()
+        links = self.driver.get_links(soup, link)
+        result = ScrapeResult(offers=offers, shops=shops, links=links)
+        return True, result

@@ -15,14 +15,14 @@ class Veha(BaseDriver):
         """Определяет тип ссылки"""
         page_404 = soup.findAll('div', class_='page-404', limit=1)
         if len(page_404) > 0:
-            link.type_link.product = False
-            link.type_link.img = False
-            link.type_link.shop = False
+            link.product = False
+            link.img = False
+            link.shop = False
             return link
         if len(re.findall(r'/catalog/product/\d*', link.url)) > 0:
-            link.type_link.product = True
+            link.product = True
         if '/kontakty/' in link.url:
-            link.type_link.shop = True
+            link.shop = True
         return link
 
     def _get_price(self, soup: BeautifulSoup) -> int:
@@ -57,9 +57,9 @@ class Veha(BaseDriver):
         return name, article, brand
 
     def get_offer(self, soup: BeautifulSoup) -> OfferData:
-        """Возвращает офер"""
+        """Возвращает оффер"""
         name, article, brand = self._get_product(soup)
-        price = self.get_price(soup)
+        price = self._get_price(soup)
         offer = OfferData(name=name, brand=brand, article=article, images=[], parameters=[],
                           count=0, price=price)
         return offer
