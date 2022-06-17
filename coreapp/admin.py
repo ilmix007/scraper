@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 @admin.register(Url)
 class UrlAdmin(admin.ModelAdmin):
     list_display = ['link', 'to_link', 'site', 'last_processing']
-    search_fields = ['link', 'site']
+    search_fields = ['link']
     list_filter = ['site']
     raw_id_fields = ['site']
 
