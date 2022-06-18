@@ -1,4 +1,4 @@
-from coreapp.models import Site, ParameterKey, SiteParameter, Url
+from coreapp.models import Site, ParameterKey, SiteParameter, Link
 from urllib.parse import urlparse
 import logging
 
@@ -31,7 +31,7 @@ class SiteFacade:
         created = 0
         updated = 0
         for url_loc in urlset:
-            _, status = Url.objects.update_or_create(link=url_loc.findNext("loc").text,
+            _, status = Link.objects.update_or_create(link=url_loc.findNext("loc").text,
                                                      site=self.site,
                                                      defaults={'link': url_loc.findNext("loc").text, 'site': self.site})
             if status:
