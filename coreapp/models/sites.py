@@ -28,8 +28,8 @@ class Link(CreatedMixin, UpdatedMixin, models.Model):
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
     domain = DomainNameField(verbose_name='Домен', unique=True)
-    crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
     DEFAULT_TIMEOUT = 0.5
+    crawl_delay = models.FloatField(verbose_name='Задержка обхода', default=DEFAULT_TIMEOUT)
 
     def __str__(self):
         return self.name if self.name else self.domain
@@ -87,5 +87,6 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
         return self.name
 
     class Meta:
+        unique_together = ('site', 'getparam')
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'

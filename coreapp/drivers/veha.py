@@ -54,19 +54,22 @@ class Veha(BaseDriver):
         tables = soup.findAll('table', class_="product-card__properties")
         brand = ''
         article = ''
-        for table in tables:
-            trs = table.findAll('tr')
-            for tr in trs:
-                for content in tr.contents:
-                    if content.text == 'Артикул':
-                        arr = [value for value in tr.contents if value != ' ']
-                        article = arr[1].text
-                    elif content.text == 'Производитель':
-                        arr = [value for value in tr.contents if value != ' ']
-                        brand = arr[1].text
-                    else:
-                        arr = [value for value in tr.contents if value != ' ']
-                        parameters.append(ParameterData(content.text, arr[1].text))
+        availabilitys = soup.findAll('div', class_="product - card__stock -count")
+        for av in availabilitys:
+            if 'в наличии' in av.text.lower():
+                for table in tables:
+                    trs = table.findAll('tr')
+                    for tr in trs:
+                        for content in tr.contents:
+                            if 'Артикул' in content.text:
+                                arr = [value for value in tr.contents if value != ' ']
+                                article = arr[1].text
+                            elif 'Производитель' in content.text:
+                                arr = [value for value in tr.contents if value != ' ']
+                                brand = arr[1].text
+                            else:
+                                arr = [value for value in tr.contents if value != ' ']
+                                parameters.append(ParameterData(content.text, arr[1].text))
         return name, article, brand
 
     def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:

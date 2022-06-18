@@ -57,9 +57,10 @@ class SiteFacade:
 
     def update_offers(self, offers: List[OfferData]):
         for offer in offers:
-            article, _ = Article.objects.get_or_create(art=offer.article, defaults=dict(art=offer.article))
+            article, _ = Article.objects.get_or_create(art=offer.article.strip(),
+                                                       defaults=dict(art=offer.article.strip()))
             if offer.brand:
-                brand, _ = Brand.objects.get_or_create(name=offer.brand, defaults={'name': offer.brand})
+                brand, _ = Brand.objects.get_or_create(name=offer.brand.strip(), defaults={'name': offer.brand.strip()})
                 product, _ = Product.objects.get_or_create(brand=brand, article=article, defaults={
                     'brand': brand,
                     'article': article})
@@ -75,10 +76,10 @@ class SiteFacade:
                 continue
             link, _ = Link.objects.get_or_create(url=offer.link.url, defaults=dict(url=offer.link.url,
                                                                                    site=self.site,
-                                                                                   alt=offer.link.alt,
+                                                                                   alt=offer.link.alt.strip(),
                                                                                    last_processing=datetime.now()))
             offer_default = dict(product=product, shop=shop,
-                                 name=offer.name, link=link,
+                                 name=offer.name.strip(), link=link,
                                  count=offer.count,
                                  price=offer.price)
             Offer.objects.get_or_create(product=product, shop=shop, defaults=offer_default)
@@ -91,10 +92,10 @@ class SiteFacade:
                 city = None
             obj, created = Shop.objects.update_or_create(site=self.site,
                                                          name=shopdata.name,
-                                                         defaults={'address': shopdata.address,
-                                                                   'phone': shopdata.phone,
+                                                         defaults={'address': shopdata.address.strip(),
+                                                                   'phone': shopdata.phone.strip(),
                                                                    'city': city,
-                                                                   'getparam': shopdata.shop_param})
+                                                                   'getparam': shopdata.shop_param.strip()})
             if created:
                 LOGGER.info(f'Created shop{obj}')
             else:

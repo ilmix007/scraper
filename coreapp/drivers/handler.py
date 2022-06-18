@@ -71,8 +71,8 @@ class Handler:
                 return False
             link_data = LinkData(url)
             self._process_soup(soup, link_data=link_data, shop_id=shop.id)
-            if settings.DEBUG:
-                break
+            # if settings.DEBUG:
+            #     break
             time.sleep(self.site.site.crawl_delay)
         return True
 
