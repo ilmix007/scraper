@@ -157,6 +157,7 @@ class RegionAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ['region', 'name']
