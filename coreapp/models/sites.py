@@ -5,8 +5,8 @@ from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, Fin
 from urllib.parse import urlparse
 
 
-class Url(CreatedMixin, UpdatedMixin, models.Model):
-    link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
+class Link(CreatedMixin, UpdatedMixin, models.Model):
+    url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     site = models.ForeignKey('coreapp.Site', verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
     alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)
     last_processing = models.DateTimeField(verbose_name='Дата последней обработки', blank=True, null=True)
@@ -16,7 +16,7 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
         verbose_name_plural = 'Ссылки'
 
     def set_schema(self):
-        self.link = self.link.replace('http://', 'https://', 1)
+        self.link = self.url.replace('http://', 'https://', 1)
 
     @property
     def domain(self):

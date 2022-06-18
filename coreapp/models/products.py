@@ -1,7 +1,7 @@
 from django.db import models
 
 from coreapp.mixins.db import UpdatedMixin, CreatedMixin
-from coreapp.models.sites import Shop, Url
+from coreapp.models.sites import Shop, Link
 
 
 class Brand(CreatedMixin, UpdatedMixin, models.Model):
@@ -63,8 +63,8 @@ class Offer(CreatedMixin, UpdatedMixin, models.Model):
     """ Параметры товаров """
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.CASCADE)
-    link = models.ForeignKey(Url, verbose_name='Ссылка', related_name='offers', on_delete=models.CASCADE)
-    imgs = models.ManyToManyField(Url, verbose_name='Изображения', blank=True)
+    link = models.ForeignKey(Link, verbose_name='Ссылка', related_name='offers', on_delete=models.CASCADE)
+    imgs = models.ManyToManyField(Link, verbose_name='Изображения', blank=True)
     count = models.IntegerField(verbose_name='Количество')
     price = models.FloatField(verbose_name='Цена')
 
