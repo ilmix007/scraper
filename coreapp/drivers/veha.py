@@ -21,6 +21,7 @@ class Veha(BaseDriver):
             return link
         if len(re.findall(r'/catalog/product/\d*', link.url)) > 0:
             link.product = True
+            link.shop = True
         if '/kontakty/' in link.url:
             link.shop = True
         return link
@@ -76,15 +77,15 @@ class Veha(BaseDriver):
 
         addresses = soup.findAll('li', class_='shops-cities-popup__shop')
         result = list()
-        for address in addresses:
-            adr = address.text.replace('\n', '')
-            shop_link = address.a.attrs.get('href')
+        for addr_tag in addresses:
+            address = addr_tag.text.replace('\n', '')
+            shop_link = addr_tag.a.attrs.get('href')
             shop_link.replace('/shop_change/', '').replace('/', '')
             ids = re.findall(r'\d+', shop_link)
-            tabid = address.parent.parent.attrs.get('data-tabid')
+            tabid = addr_tag.parent.parent.attrs.get('data-tabid')
             if len(ids) == 1:
                 city = city_dict[tabid]
-                name = f'{city} - {adr}'
+                name = f'{city} - {address}'
                 shop = ShopData(name=name, city=city, address=address, shop_param=f'?change_city={ids[0]}')
                 result.append(shop)
         return result

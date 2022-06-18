@@ -4,6 +4,8 @@ from django_dnf.fields import DomainNameField
 from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin
 from urllib.parse import urlparse
 
+from coreapp.models import City
+
 
 class Link(CreatedMixin, UpdatedMixin, models.Model):
     url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
@@ -47,6 +49,7 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
         verbose_name = 'Сайт'
         verbose_name_plural = 'Сайты'
 
+
 class ParameterKey(models.Model):
     title = models.CharField(verbose_name='Ключ', max_length=63, unique=True)
 
@@ -74,8 +77,9 @@ class SiteParameter(models.Model):
 
 class Shop(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
+    city = models.ForeignKey(to=City, verbose_name='Город', blank=True, null=True, on_delete=models.SET_NULL)
     address = models.CharField(verbose_name='Адрес', unique=True, max_length=255)
-    phone = PhoneNumberField(null=True, blank=True, unique=True)
+    phone = PhoneNumberField(null=True, blank=True)
     site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
     getparam = models.CharField(verbose_name='Get-параметр', max_length=63, null=True, blank=True)
 

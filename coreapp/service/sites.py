@@ -53,11 +53,12 @@ class SiteFacade:
 
     def update_shops(self, shopsdata: List[ShopData]):
         for shopdata in shopsdata:
-            domain = urlparse(shopdata.url).netloc.replace('www.', '')
-            Site.objects.filter(url)
-            print(domain)
             obj, created = Shop.objects.update_or_create(name=shopdata.name,
                                                          address=shopdata.address,
                                                          phone=shopdata.phone,
-                                                         site=shopdata.url
-                                                         )
+                                                         getparam=shopdata.shop_param,
+                                                         site=self.site)
+            if created:
+                LOGGER.info(f'Created shop{obj}')
+            else:
+                LOGGER.info(f'{obj} exists')
