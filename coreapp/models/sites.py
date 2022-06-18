@@ -48,7 +48,10 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
         verbose_name_plural = 'Сайты'
 
     def set_schema(self):
-        self.url = self.url.replace('http://', 'https://', 1)
+        if self.url.find('http') < 0:
+            self.url = f'https://{self.url}'
+        else:
+            self.url = self.url.replace('http://', 'https://', 1)
 
 
 class ParameterKey(models.Model):
@@ -89,4 +92,3 @@ class Shop(CreatedMixin, UpdatedMixin, models.Model):
     class Meta:
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'
-
