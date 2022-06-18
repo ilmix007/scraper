@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from coreapp.drivers.handler import Handler
-from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Link
+from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Link, Region, City
 from django.contrib import messages
 import logging
 
@@ -150,3 +150,16 @@ class SiteParameterAdmin(admin.ModelAdmin):
 class ParameterKeyAdmin(admin.ModelAdmin):
     list_display = ['title']
     search_fields = ['title']
+
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ['region', 'name']
+    search_fields = ['region', 'name']
+    list_filter = ['region']
+    raw_id_fields = ['region']
