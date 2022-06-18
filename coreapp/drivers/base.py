@@ -14,7 +14,7 @@ from django.conf import settings
 from dataclasses import dataclass, field
 
 LOGGER = logging.getLogger(__name__)
-__all__ = ['BaseDriver', 'Driver', 'ScrapeResult', 'LinkData', 'ShopData', 'ParameterData', 'OfferData']
+__all__ = ['BaseDriver', 'Driver', 'LinkData', 'ShopData', 'ParameterData', 'OfferData']
 
 
 @dataclass
@@ -62,14 +62,6 @@ class OfferData:
     price: float = 0
 
 
-class ScrapeResult:
-    """Результат веб-скрапинга"""
-
-    def __init__(self, offers: List[OfferData] = list(), links: List[LinkData] = list(),
-                 shops: List[ShopData] = list()):
-        self.offers = offers
-        self.links = links
-        self.shops = shops
 
 
 class BaseDriver(ABC):

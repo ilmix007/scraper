@@ -2,7 +2,7 @@ from typing import List
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from coreapp.drivers.base import Driver, ScrapeResult, LinkData
+from coreapp.drivers.base import Driver, LinkData
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
 import logging
@@ -37,26 +37,26 @@ class Handler:
             created, updated = self.site.create_urls(urls)
         return created, updated
 
-    def scrape(self, url) -> (bool, List[ScrapeResult] or Exception):
+    def scrape(self, url) -> bool:
 
         if settings.DEBUG:
             soup = self.driver.get_soup(url)
         else:
             try:
-                result = self.driver.get_soup(url)
-                return True, result
+                soup = self.driver.get_soup(url)
             except Exception as ex:
-                return False, ex
-        link = LinkData(url)
-        link = self.driver.get_link_type(soup, link)
-        if link.shop:
-            shops = self.driver.get_shops(soup, link)
+                LOGGER.error(f'Failure scrape for {url.site.title}. Exception: {ex}')
+                return False
+        link_data = LinkData(url)
+        link_data = self.driver.get_link_type(soup, link_data)
+        if link_data.shop:
+            shops = self.driver.get_shops(soup, link_data)
         else:
             shops = list()
-        if link.offer:
+        if link_data.offer:
             offers = self.driver.get_offers(soup)
         else:
             offers = list()
-        links = self.driver.get_links(soup, link)
-        result = ScrapeResult(offers=offers, shops=shops, links=links)
-        return True, result
+        links = self.driver.get_links(soup, link_data)
+
+        return True
