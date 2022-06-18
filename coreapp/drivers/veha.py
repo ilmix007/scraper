@@ -15,12 +15,12 @@ class Veha(BaseDriver):
         """Определяет тип ссылки"""
         page_404 = soup.findAll('div', class_='page-404', limit=1)
         if len(page_404) > 0:
-            link.product = False
+            link.offer = False
             link.img = False
             link.shop = False
             return link
         if len(re.findall(r'/catalog/product/\d*', link.url)) > 0:
-            link.product = True
+            link.offer = True
             link.shop = True
         if '/kontakty/' in link.url:
             link.shop = True
@@ -38,6 +38,15 @@ class Veha(BaseDriver):
                 return int(prices[0])
             return 0
 
+    def _get_count(self, soup: BeautifulSoup) -> int:
+        count = soup.findAll('span', class_='red-text')[0].text
+        count = count.replace('\n', '').replace(' ', '')
+        count = re.findall(r'\d+', count)
+        if len(count) == 1:
+            return int(count[0])
+        else:
+            return 0
+
     def _get_product(self, soup: BeautifulSoup) -> (str, str, str):
         h1 = soup.findAll('h1', class_="title-lg", limit=1)
         name = h1[0].contents[0]
@@ -48,21 +57,26 @@ class Veha(BaseDriver):
         for table in tables:
             trs = table.findAll('tr')
             for tr in trs:
-                for index, content in enumerate(tr.contents):
+                for content in tr.contents:
                     if content.text == 'Артикул':
-                        article = tr.contents[index + 1]
+                        arr = [value for value in tr.contents if value != ' ']
+                        article = arr[1].text
                     elif content.text == 'Производитель':
-                        brand = tr.contents[index + 1]
-                    elif index + 1 < len(tr.contents):
-                        parameters.append(ParameterData(content.text, tr.contents[index + 1]))
+                        arr = [value for value in tr.contents if value != ' ']
+                        brand = arr[1].text
+                    else:
+                        arr = [value for value in tr.contents if value != ' ']
+                        parameters.append(ParameterData(content.text, arr[1].text))
         return name, article, brand
 
-    def get_offers(self, soup: BeautifulSoup) -> List[OfferData]:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Возвращает офферы"""
         name, article, brand = self._get_product(soup)
         price = self._get_price(soup)
+        count = self._get_count(soup)
         offer = OfferData(name=name, brand=brand, article=article, images=[], parameters=[],
-                          count=0, price=price)
+                          count=count, price=price, shop_id=shop_id, link=link_data)
+        print(offer)
         return [offer]
 
     def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:

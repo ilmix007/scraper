@@ -1,8 +1,9 @@
-from typing import List
+from datetime import datetime
 
-from coreapp.drivers.base import ShopData
-from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop, City
-from urllib.parse import urlparse
+from typing import List
+from coreapp.drivers.base import ShopData, OfferData
+from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop, City, Offer, Product, Brand, Parameter, \
+    Article
 import logging
 
 LOGGER = logging.getLogger(__name__)
@@ -53,6 +54,34 @@ class SiteFacade:
 
     def get_shops(self):
         return self.site.shops.all()
+
+    def update_offers(self, offers: List[OfferData]):
+        for offer in offers:
+            article, _ = Article.objects.get_or_create(art=offer.article, defaults=dict(art=offer.article))
+            if offer.brand:
+                brand, _ = Brand.objects.get_or_create(name=offer.brand, defaults={'name': offer.brand})
+                product, _ = Product.objects.get_or_create(brand=brand, article=article, defaults={
+                    'brand': brand,
+                    'article': article})
+            else:
+                product, _ = Product.objects.get_or_create(article=article, defaults={'article': article})
+            for param in offer.parameters:
+                Parameter.objects.get_or_create(name=param.name, value=param.value,
+                                                defaults={'name': param.name, 'value': param.value})
+            try:
+                shop = Shop.objects.get(id=offer.shop_id)
+            except Shop.DoesNotExist:
+                LOGGER.error('Shop.DoesNotExist')
+                continue
+            link, _ = Link.objects.get_or_create(url=offer.link.url, defaults=dict(url=offer.link.url,
+                                                                                   site=self.site,
+                                                                                   alt=offer.link.alt,
+                                                                                   last_processing=datetime.now()))
+            offer_default = dict(product=product, shop=shop,
+                                 name=offer.name, link=link,
+                                 count=offer.count,
+                                 price=offer.price)
+            Offer.objects.get_or_create(product=product, shop=shop, defaults=offer_default)
 
     def update_shops(self, shopsdata: List[ShopData]):
         for shopdata in shopsdata:

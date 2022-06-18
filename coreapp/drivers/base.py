@@ -51,7 +51,7 @@ class ParameterData:
 @dataclass
 class OfferData:
     """Товарное предложение"""
-    shop: ShopData
+    shop_id: int
     link: LinkData
     images: List
     parameters: List
@@ -70,7 +70,7 @@ class BaseDriver(ABC):
         self.headers = {'User-Agent': self.user_agent}
 
     @abstractmethod
-    def get_offers(self, soup: BeautifulSoup) -> List[OfferData]:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Получить список оферов"""
         pass
 
@@ -97,7 +97,7 @@ class BaseDriver(ABC):
         service = Service(executable_path=settings.CHROME_PATH)
         wd = webdriver.Chrome(options=chrome_options, service=service)
         wd.get(url)
-        html = wd.page_source
+        html = wd.page_source.replace('\n', '').replace('\r', '')
         wd.quit()
         soup = BeautifulSoup(html, 'lxml')
         return soup
@@ -181,7 +181,7 @@ class BaseDriver(ABC):
 class Driver(BaseDriver):
     """Драйвер по умолчанию"""
 
-    def get_offers(self, soup: BeautifulSoup) -> OfferData:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int , link_data: LinkData) -> List[OfferData]:
         """Получить офферы"""
         pass
 

@@ -10,7 +10,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Autorus(BaseDriver):
-    def get_offers(self, soup: BeautifulSoup) -> List[OfferData]:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Получить список оферов"""
         pass
 
