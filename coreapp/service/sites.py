@@ -55,7 +55,7 @@ class SiteFacade:
         for shopdata in shopsdata:
             try:
                 city = City.objects.get(name__iexact=shopdata.city)
-            except City.DoesNotExist:
+            except (City.DoesNotExist, City.MultipleObjectsReturned):
                 city = None
             obj, created = Shop.objects.update_or_create(site=self.site,
                                                          name=shopdata.name,

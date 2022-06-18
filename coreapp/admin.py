@@ -75,10 +75,10 @@ class OfferAdmin(admin.ModelAdmin):
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ['name', 'site', 'address', 'phone']
+    list_display = ['name', 'site', 'address', 'city', 'phone']
     search_fields = ['name', 'address', 'phone']
     raw_id_fields = ['site', 'city']
-    list_filter = ['site']
+    list_filter = ['site', ('city', admin.RelatedOnlyFieldListFilter)]
 
 
 @admin.register(Site)
