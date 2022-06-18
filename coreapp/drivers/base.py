@@ -146,6 +146,10 @@ class BaseDriver(ABC):
         return result_data_set
 
     def _request(self, url):
+        if url.find('http') < 0:
+            url = f'https://{url}'
+        else:
+            url = url.replace('http://', 'https://', 1)
         try:
             result = requests.get(url, headers=self.headers)
             if result.status_code == 200:

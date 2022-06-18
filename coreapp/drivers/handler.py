@@ -14,14 +14,14 @@ __all__ = ['Handler']
 class Handler:
     def __init__(self, site: SiteFacade):
         self.site = site
-        drive_class = DRIVER_CONF.get(self.site.get_domain())
+        drive_class = DRIVER_CONF.get(self.site.domain)
         if drive_class:
             self.driver = drive_class()
         else:
             self.driver = Driver()
 
     def read_robots(self) -> bool:
-        url = f'{self.site.url}/robots.txt'
+        url = f'{self.site.domain}/robots.txt'
         result_data_set, status = self.driver.get_robots(url)
         if status:
             for key, values in result_data_set.items():

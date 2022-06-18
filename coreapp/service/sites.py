@@ -1,4 +1,7 @@
-from coreapp.models import Site, ParameterKey, SiteParameter, Link
+from typing import List
+
+from coreapp.drivers.base import ShopData
+from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop
 from urllib.parse import urlparse
 import logging
 
@@ -10,7 +13,7 @@ class SiteFacade:
 
     def __init__(self, site: Site):
         self.site = site
-        self.url = site.url
+        self.domain = site.domain
 
     def set_params(self, key, values: list):
         key, _ = ParameterKey.objects.get_or_create(title=key, defaults={'title': key})
@@ -45,18 +48,16 @@ class SiteFacade:
         urls = list(self.site.parameters.filter(key__in=keys).values_list('value', flat=True))
         return urls
 
-    def get_domain(self):
-        return urlparse(self.url).netloc
-
     def clear_urls(self):
         return self.site.urls.all().delete()
 
-    # def update_shops(self, shops:List[Shop]):
-    #     for shop in shops:
-    #         obj, created = Shop.objects.update_or_create(
-    #             name,
-    #         address,
-    #         phone =,
-    #         site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
-    #         getparam
-    #         )
+    def update_shops(self, shopsdata: List[ShopData]):
+        for shopdata in shopsdata:
+            domain = urlparse(shopdata.url).netloc.replace('www.', '')
+            Site.objects.filter(url)
+            print(domain)
+            obj, created = Shop.objects.update_or_create(name=shopdata.name,
+                                                         address=shopdata.address,
+                                                         phone=shopdata.phone,
+                                                         site=shopdata.url
+                                                         )

@@ -1,6 +1,6 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django_dnf.fields import DomainNameField
 from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin
 from urllib.parse import urlparse
 
@@ -25,16 +25,16 @@ class Link(CreatedMixin, UpdatedMixin, models.Model):
 
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
-    url = models.URLField(verbose_name='url', unique=True, max_length=255)
+    domain = DomainNameField(verbose_name='Домен', unique=True)
     crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
     DEFAULT_TIMEOUT = 0.5
 
     def __str__(self):
-        return self.name if self.name else self.url
+        return self.name if self.name else self.domain
 
     @property
     def title(self):
-        return self.name if self.name else self.url
+        return self.name if self.name else self.domain
 
     @property
     def timeout(self):
@@ -46,13 +46,6 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
     class Meta:
         verbose_name = 'Сайт'
         verbose_name_plural = 'Сайты'
-
-    def set_schema(self):
-        if self.url.find('http') < 0:
-            self.url = f'https://{self.url}'
-        else:
-            self.url = self.url.replace('http://', 'https://', 1)
-
 
 class ParameterKey(models.Model):
     title = models.CharField(verbose_name='Ключ', max_length=63, unique=True)

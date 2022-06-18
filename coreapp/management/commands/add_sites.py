@@ -13,12 +13,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         LOGGER.info('Start add coordinate for meters')
-        for domen in DRIVER_CONF.keys():
-            site, created = Site.objects.get_or_create(url=domen, defaults={'url': domen})
+        for domain in DRIVER_CONF.keys():
+            site, created = Site.objects.get_or_create(domain=domain, defaults={'domain': domain})
             if created:
                 LOGGER.info(f'Created {site}')
             else:
                 LOGGER.info(f'{site} exists')
-
-
         LOGGER.info('Finish add coordinate for meters')

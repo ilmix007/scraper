@@ -30,7 +30,7 @@ class LinkAdmin(admin.ModelAdmin):
         for link in queryset:
             site_facade = SiteFacade(link.site)
             handler = Handler(site_facade)
-            if handler.scrape(link.link):
+            if handler.scrape(link.url):
                 success_urls.append(link.site.title)
             else:
                 fail_urls.append(link.site.title)
@@ -82,8 +82,8 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
-    list_display = ['title', 'url']
-    search_fields = ['name', 'url']
+    list_display = ['title', 'domain']
+    search_fields = ['name', 'domain']
     actions = ['read_robots', 'read_sitemap', 'clear_urls']
 
     @admin.action(description='Прочитать robots.txt')

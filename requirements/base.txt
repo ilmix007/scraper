@@ -9,6 +9,7 @@ cryptography==37.0.2
 Django==3.2.7
 django-admin-tools==0.9.1
 django-debug-toolbar==3.2.2
+django-domainname==0.1.1
 django-phonenumber-field==6.1.0
 djangorestframework==3.12.4
 h11==0.13.0
