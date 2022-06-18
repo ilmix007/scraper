@@ -75,9 +75,9 @@ class OfferAdmin(admin.ModelAdmin):
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ['site', 'name', 'address', 'phone']
+    list_display = ['name', 'site', 'address', 'phone']
     search_fields = ['name', 'address', 'phone']
-    raw_id_fields = ['site']
+    raw_id_fields = ['site', 'city']
     list_filter = ['site']
 
 
@@ -160,7 +160,7 @@ class RegionAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ['region', 'name']
-    search_fields = ['region', 'name']
+    list_display = ['name', 'region', 'description']
+    search_fields = ['name']
     list_filter = ['region']
     raw_id_fields = ['region']

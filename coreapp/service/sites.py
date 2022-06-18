@@ -1,7 +1,7 @@
 from typing import List
 
 from coreapp.drivers.base import ShopData
-from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop
+from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop, City
 from urllib.parse import urlparse
 import logging
 
@@ -53,11 +53,16 @@ class SiteFacade:
 
     def update_shops(self, shopsdata: List[ShopData]):
         for shopdata in shopsdata:
-            obj, created = Shop.objects.update_or_create(name=shopdata.name,
-                                                         address=shopdata.address,
-                                                         phone=shopdata.phone,
-                                                         getparam=shopdata.shop_param,
-                                                         site=self.site)
+            try:
+                city = City.objects.get(name__iexact=shopdata.city)
+            except City.DoesNotExist:
+                city = None
+            obj, created = Shop.objects.update_or_create(site=self.site,
+                                                         name=shopdata.name,
+                                                         defaults={'address': shopdata.address,
+                                                                   'phone': shopdata.phone,
+                                                                   'city': city,
+                                                                   'getparam': shopdata.shop_param})
             if created:
                 LOGGER.info(f'Created shop{obj}')
             else:

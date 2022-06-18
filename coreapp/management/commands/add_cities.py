@@ -16,15 +16,22 @@ class Command(BaseCommand):
     help = "Create regions and cities"
 
     def handle(self, *args, **kwargs):
+        City.objects.all().delete()
+        Region.objects.all().delete()
         russia = AREAS[0]
         for region_dict in russia['areas']:
             region_obj, _ = Region.objects.get_or_create(name=region_dict["name"],
                                                          defaults={"name": region_dict["name"]}, )
             for city in region_dict['areas']:
-                city_name = city["name"].split(' (')[0] if '(' in city["name"] else city["name"]
-                city_obj, _ = City.objects.get_or_create(name=city_name, region=region_obj,
-                                                         defaults={"name": city["name"], "region": region_obj})
-            regions = Region.objects.all().count()
-            cities = City.objects.all().count()
-            LOGGER.info(f"Регионы: {regions}")
-            LOGGER.info(f"Города: {cities}")
+                if '(' in city["name"]:
+                    city_arr = city["name"].split(' (')
+                    city_name = city_arr[0]
+                    description = city_arr[-1].split(')')[0]
+                else:
+                    city_name = city["name"]
+                    description = None
+                city_obj, _ = City.objects.get_or_create(name=city_name, region=region_obj, description=description,
+                                                         defaults={"name": city_name, "region": region_obj,
+                                                                   'description': description})
+        LOGGER.info(f"Regions: {Region.objects.all().count()}")
+        LOGGER.info(f"Cities: {City.objects.all().count()}")
