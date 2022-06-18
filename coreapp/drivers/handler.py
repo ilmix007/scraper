@@ -51,12 +51,9 @@ class Handler:
         link_data = self.driver.get_link_type(soup, link_data)
         if link_data.shop:
             shops = self.driver.get_shops(soup, link_data)
-        else:
-            shops = list()
+            self.site.update_shops(shopsdata=shops)
         if link_data.offer:
             offers = self.driver.get_offers(soup)
-        else:
-            offers = list()
         links = self.driver.get_links(soup, link_data)
 
         return True
