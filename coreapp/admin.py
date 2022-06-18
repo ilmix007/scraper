@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from coreapp.drivers.handler import Handler
-from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Url
+from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Link
 from django.contrib import messages
 import logging
 
@@ -11,14 +11,14 @@ from coreapp.service.sites import SiteFacade
 LOGGER = logging.getLogger(__name__)
 
 
-@admin.register(Url)
-class UrlAdmin(admin.ModelAdmin):
-    list_display = ['link', 'to_link', 'site', 'last_processing']
-    search_fields = ['link']
+@admin.register(Link)
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ['url', 'to_url', 'site', 'last_processing']
+    search_fields = ['url']
     list_filter = ['site']
     raw_id_fields = ['site']
 
-    def to_link(self, obj):
+    def to_url(self, obj):
         return format_html('<a href="{}" target="_blank">ссылка</a>'.format(obj.link))
 
     actions = ['scrape']
@@ -27,15 +27,14 @@ class UrlAdmin(admin.ModelAdmin):
     def scrape(self, request, queryset):
         success_urls = list()
         fail_urls = list()
-        for url in queryset:
-            site_facade = SiteFacade(url.site)
+        for link in queryset:
+            site_facade = SiteFacade(link.site)
             handler = Handler(site_facade)
-            status, result = handler.scrape(url.link)
-            if status:
-                success_urls.append(url.site.title)
+            if handler.scrape(link.link):
+                success_urls.append(link.site.title)
             else:
-                fail_urls.append(url.site.title)
-                LOGGER.error(f'Failure scrape for {url.site.title}. Exception: {result}')
+                fail_urls.append(link.site.title)
+
         if len(success_urls) > 0 and len(fail_urls) == 0:
             self.message_user(request, f"Успешно {len(success_urls)}", messages.SUCCESS)
         elif len(success_urls) == 0 and len(fail_urls) != 0:
