@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 from random import randint
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set
 from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
@@ -62,8 +62,6 @@ class OfferData:
     price: float = 0
 
 
-
-
 class BaseDriver(ABC):
     """Базовый класс драйвера"""
 
@@ -112,16 +110,19 @@ class BaseDriver(ABC):
         LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
         return dict(), False
 
-    def get_urls_from_sitemap(self, sitemap_urls) -> List:
+    def get_urls_from_sitemap(self, sitemap_urls) -> Set:
         """Возвращает ссылки из sitemap"""
-        for url in sitemap_urls:
-            result = self._request(url)
-            if result.status_code == 200:
-                soup = BeautifulSoup(result.content, features='xml')
-                return self._process_sitemap(soup)
+        result = set()
+        for sitemap_url in sitemap_urls:
+            resp = self._request(sitemap_url)
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.content, features='xml')
+                urls = self._process_sitemap(soup)
+                for url in urls:
+                    result.add(url.findNext("loc").text)
             else:
-                LOGGER.error(f"Error receiving sitemap {result}. User-agent: {self.user_agent}")
-                return False
+                LOGGER.error(f"Error receiving sitemap {resp}. User-agent: {self.user_agent}")
+        return result
 
     def _process_robots(self, robots_txt: str) -> dict:
         """Обработать robots.txt"""

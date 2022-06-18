@@ -19,7 +19,7 @@ class LinkAdmin(admin.ModelAdmin):
     raw_id_fields = ['site']
 
     def to_url(self, obj):
-        return format_html('<a href="{}" target="_blank">ссылка</a>'.format(obj.link))
+        return format_html('<a href="{}" target="_blank">ссылка</a>'.format(obj.url))
 
     actions = ['scrape']
 

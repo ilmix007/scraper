@@ -30,10 +30,10 @@ class SiteFacade:
     def create_urls(self, urlset):
         created = 0
         updated = 0
-        for url_loc in urlset:
-            _, status = Link.objects.update_or_create(link=url_loc.findNext("loc").text,
-                                                     site=self.site,
-                                                     defaults={'link': url_loc.findNext("loc").text, 'site': self.site})
+        for url in urlset:
+            _, status = Link.objects.get_or_create(url=url,
+                                                   site=self.site,
+                                                   defaults={'url': url, 'site': self.site})
             if status:
                 created += 1
             else:
