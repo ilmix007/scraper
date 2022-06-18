@@ -12,11 +12,11 @@ class Command(BaseCommand):
     help = 'Add coordinate for meter'
 
     def handle(self, *args, **options):
-        LOGGER.info('Start add coordinate for meters')
+        LOGGER.info('Start adding sites')
         for domain in DRIVER_CONF.keys():
             site, created = Site.objects.get_or_create(domain=domain, defaults={'domain': domain})
             if created:
                 LOGGER.info(f'Created {site}')
             else:
                 LOGGER.info(f'{site} exists')
-        LOGGER.info('Finish add coordinate for meters')
+        LOGGER.info('Finish adding sites')
