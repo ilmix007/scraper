@@ -51,6 +51,9 @@ class SiteFacade:
     def clear_urls(self):
         return self.site.urls.all().delete()
 
+    def get_shops(self):
+        return self.site.shops.all()
+
     def update_shops(self, shopsdata: List[ShopData]):
         for shopdata in shopsdata:
             try:
