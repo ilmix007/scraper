@@ -54,8 +54,7 @@ class Handler:
         else:
             shops = list()
         if link.offer:
-            offer = self.driver.get_offer(soup)
-            offers = [offer]
+            offers = self.driver.get_offers(soup)
         else:
             offers = list()
         links = self.driver.get_links(soup, link)

@@ -56,13 +56,13 @@ class Veha(BaseDriver):
                         parameters.append(ParameterData(content.text, tr.contents[index + 1]))
         return name, article, brand
 
-    def get_offer(self, soup: BeautifulSoup) -> OfferData:
-        """Возвращает оффер"""
+    def get_offers(self, soup: BeautifulSoup) -> List[OfferData]:
+        """Возвращает офферы"""
         name, article, brand = self._get_product(soup)
         price = self._get_price(soup)
         offer = OfferData(name=name, brand=brand, article=article, images=[], parameters=[],
                           count=0, price=price)
-        return offer
+        return [offer]
 
     def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
         # https://veha-corp.ru/shop_change/9/

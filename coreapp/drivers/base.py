@@ -80,7 +80,7 @@ class BaseDriver(ABC):
         self.headers = {'User-Agent': self.user_agent}
 
     @abstractmethod
-    def get_offer(self, soup: BeautifulSoup) -> OfferData:
+    def get_offers(self, soup: BeautifulSoup) -> List[OfferData]:
         """Получить список оферов"""
         pass
 
@@ -184,8 +184,8 @@ class BaseDriver(ABC):
 class Driver(BaseDriver):
     """Драйвер по умолчанию"""
 
-    def get_offer(self, soup: BeautifulSoup) -> OfferData:
-        """Получить оффер"""
+    def get_offers(self, soup: BeautifulSoup) -> OfferData:
+        """Получить офферы"""
         pass
 
     def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:
