@@ -70,7 +70,7 @@ class OfferAdmin(admin.ModelAdmin):
     list_display = ['product', 'shop', 'count', 'price']
     search_fields = ['product', 'shop']
     list_filter = ['product__brand']
-    raw_id_fields = ['product', 'shop']
+    raw_id_fields = ['product', 'shop', 'link', 'imgs']
 
 
 @admin.register(Shop)
