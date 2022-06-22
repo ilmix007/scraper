@@ -10,7 +10,7 @@ from coreapp.models import City
 class Link(CreatedMixin, UpdatedMixin, models.Model):
     url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     site = models.ForeignKey('coreapp.Site', verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
-    alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)
+    alt = models.CharField(verbose_name='Альтернативный текст', max_length=255, blank=True, null=True)
     last_processing = models.DateTimeField(verbose_name='Дата последней обработки', blank=True, null=True)
 
     class Meta:
