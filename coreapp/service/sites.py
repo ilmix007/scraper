@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from typing import List
-from coreapp.drivers.base import ShopData, OfferData
+from coreapp.drivers.base import ShopData, OfferData, LinkData
 from coreapp.models import Site, ParameterKey, SiteParameter, Link, Shop, City, Offer, Product, Brand, Parameter, \
     Article
 import logging
@@ -38,6 +38,18 @@ class SiteFacade:
             _, status = Link.objects.get_or_create(url=url,
                                                    site=self.site,
                                                    defaults={'url': url, 'site': self.site})
+            if status:
+                created += 1
+            else:
+                updated += 1
+        return created, updated
+
+    def create_links(self, links: List[LinkData]):
+        created = 0
+        updated = 0
+        for link in links:
+            _, status = Link.objects.get_or_create(url=link.url, site=self.site,
+                                                   defaults={'url': link.url, 'alt': link.alt, 'site': self.site})
             if status:
                 created += 1
             else:
