@@ -84,4 +84,6 @@ class Handler:
         if link_data.offer:
             offers = self.driver.get_offers(soup, shop_id, link_data)
             self.site.update_offers(offers=offers)
-        # links = self.driver.get_links(soup, link_data)
+        links = self.driver.get_links(soup, link_data)
+        created, updated = self.site.create_links(links)
+        LOGGER.info(f'Created: {created} link(s). Updated {updated} link(s)')
