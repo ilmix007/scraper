@@ -1,4 +1,5 @@
 from typing import List
+from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 import re
@@ -109,4 +110,14 @@ class Veha(BaseDriver):
 
     def get_links(self, soup: BeautifulSoup, link: LinkData) -> List[LinkData]:
         """Возвращает список ссылок"""
-        pass
+        prod_links = soup.findAll('a', class_='product__pic product__pic--item')
+        url_obj = urlparse(link.url)
+        host = urlparse(link.url).netloc
+        result = list()
+        for pl in prod_links:
+            alt = pl.img.attrs.get('alt')
+            url = pl.attrs.get('href')
+            url = urljoin(f'{url_obj.scheme}://{url_obj.netloc}', url)
+            link = LinkData(url=url, alt=alt, offer=True, shop=False, img=False)
+            result.append(link)
+        return result
