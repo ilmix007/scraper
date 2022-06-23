@@ -181,7 +181,7 @@ class BaseDriver(ABC):
 class Driver(BaseDriver):
     """Драйвер по умолчанию"""
 
-    def get_offers(self, soup: BeautifulSoup, shop_id: int , link_data: LinkData) -> List[OfferData]:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Получить офферы"""
         pass
 
