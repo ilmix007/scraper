@@ -1,3 +1,5 @@
+import time
+
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -34,6 +36,7 @@ class LinkAdmin(admin.ModelAdmin):
                 success_urls.append(link.site.title)
             else:
                 fail_urls.append(link.site.title)
+            time.sleep(site_facade.site.crawl_delay)
 
         if len(success_urls) > 0 and len(fail_urls) == 0:
             self.message_user(request, f"Успешно {len(success_urls)}", messages.SUCCESS)
