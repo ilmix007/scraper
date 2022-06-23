@@ -41,6 +41,7 @@ class Handler:
         return created, updated
 
     def get_soup(self, url):
+        """Получить soup страницы сайта"""
         if settings.DEBUG:
             soup = self.driver.get_soup(url)
         else:
