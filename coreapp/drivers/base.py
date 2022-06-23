@@ -94,10 +94,15 @@ class BaseDriver(ABC):
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
+        # chrome_options.headless = True
+        # chrome_options.add_argument("--enable-javascript")
         service = Service(executable_path=settings.CHROME_PATH)
         wd = webdriver.Chrome(options=chrome_options, service=service)
         wd.get(url)
-        html = wd.page_source.replace('\n', '').replace('\r', '')
+        time.sleep(1)
+        wd.refresh()
+        html = wd.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
+        html = html.replace('\n', '').replace('\r', '')
         wd.quit()
         soup = BeautifulSoup(html, 'lxml')
         return soup
