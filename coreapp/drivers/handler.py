@@ -32,7 +32,7 @@ class Handler:
 
     def read_sitemap(self):
         created, updated = 0, 0
-        sitemap_urls = list(self.site.get_urls(['Sitemap', 'sitemap']))
+        sitemap_urls = list(self.site.get_site_parameters(['Sitemap', 'sitemap']))
         urls = self.driver.get_urls_from_sitemap(sitemap_urls)
         if urls:
             created, updated = self.site.create_urls(urls)

@@ -110,7 +110,7 @@ class BaseDriver(ABC):
         LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
         return dict(), False
 
-    def get_urls_from_sitemap(self, sitemap_urls) -> Set:
+    def get_urls_from_sitemap(self, sitemap_urls: List) -> Set:
         """Возвращает ссылки из sitemap"""
         result = set()
         for sitemap_url in sitemap_urls:

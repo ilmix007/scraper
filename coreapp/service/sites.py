@@ -32,6 +32,7 @@ class SiteFacade:
                                                                defaults={'key': key, 'value': val, 'site': self.site})
 
     def create_urls(self, urlset):
+        """Создать ссылки по списку url-ов"""
         created = 0
         updated = 0
         for url in urlset:
@@ -45,6 +46,7 @@ class SiteFacade:
         return created, updated
 
     def create_links(self, links: List[LinkData]):
+        """Создать ссылки по списку LinkData"""
         created = 0
         updated = 0
         for link in links:
@@ -56,7 +58,8 @@ class SiteFacade:
                 updated += 1
         return created, updated
 
-    def get_urls(self, keys: list):
+    def get_site_parameters(self, keys: list):
+        """Получить параметры сайта"""
         keys = ParameterKey.objects.filter(title__in=keys)
         urls = list(self.site.parameters.filter(key__in=keys).values_list('value', flat=True))
         return urls
