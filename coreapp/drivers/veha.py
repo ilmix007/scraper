@@ -40,11 +40,15 @@ class Veha(BaseDriver):
             return 0
 
     def _get_count(self, soup: BeautifulSoup) -> int:
-        count = soup.findAll('span', class_='red-text')[0].text
-        count = count.replace('\n', '').replace(' ', '')
-        count = re.findall(r'\d+', count)
-        if len(count) == 1:
-            return int(count[0])
+        availabilitys = soup.findAll('div', class_="product - card__stock -count")
+        for av in availabilitys:
+            if 'в наличии' in av.text.lower():
+                count = soup.findAll('span', class_='red-text')[0].text
+                count = count.replace('\n', '').replace(' ', '')
+                count = re.findall(r'\d+', count)
+                if len(count) == 1:
+                    return int(count[0])
+                break
         else:
             return 0
 
@@ -55,22 +59,19 @@ class Veha(BaseDriver):
         tables = soup.findAll('table', class_="product-card__properties")
         brand = ''
         article = ''
-        availabilitys = soup.findAll('div', class_="product - card__stock -count")
-        for av in availabilitys:
-            if 'в наличии' in av.text.lower():
-                for table in tables:
-                    trs = table.findAll('tr')
-                    for tr in trs:
-                        for content in tr.contents:
-                            if 'Артикул' in content.text:
-                                arr = [value for value in tr.contents if value != ' ']
-                                article = arr[1].text
-                            elif 'Производитель' in content.text:
-                                arr = [value for value in tr.contents if value != ' ']
-                                brand = arr[1].text
-                            else:
-                                arr = [value for value in tr.contents if value != ' ']
-                                parameters.append(ParameterData(content.text, arr[1].text))
+        for table in tables:
+            trs = table.findAll('tr')
+            for tr in trs:
+                for content in tr.contents:
+                    if 'Артикул' in content.text:
+                        arr = [value for value in tr.contents if value != ' ']
+                        article = arr[1].text
+                    elif 'Производитель' in content.text:
+                        arr = [value for value in tr.contents if value != ' ']
+                        brand = arr[1].text
+                    else:
+                        arr = [value for value in tr.contents if value != ' ']
+                        parameters.append(ParameterData(content.text, arr[1].text))
         return name, article, brand
 
     def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:

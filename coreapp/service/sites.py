@@ -77,13 +77,11 @@ class SiteFacade:
         for offer in offers:
             article, _ = Article.objects.get_or_create(art=offer.article.strip(),
                                                        defaults=dict(art=offer.article.strip()))
+            payload = {'article': article, 'name': offer.name.strip()}
             if offer.brand:
                 brand, _ = Brand.objects.get_or_create(name=offer.brand.strip(), defaults={'name': offer.brand.strip()})
-                product, _ = Product.objects.get_or_create(brand=brand, article=article, defaults={
-                    'brand': brand,
-                    'article': article})
-            else:
-                product, _ = Product.objects.get_or_create(article=article, defaults={'article': article})
+                payload.update({'brand': brand})
+            product, _ = Product.objects.get_or_create(article=article, defaults=payload)
             for param in offer.parameters:
                 Parameter.objects.get_or_create(name=param.name, value=param.value,
                                                 defaults={'name': param.name, 'value': param.value})
