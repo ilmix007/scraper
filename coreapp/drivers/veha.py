@@ -54,7 +54,10 @@ class Veha(BaseDriver):
 
     def _get_product(self, soup: BeautifulSoup) -> (str, str, str):
         h1 = soup.findAll('h1', class_="title-lg", limit=1)
-        name = h1[0].contents[0]
+        try:
+            name = h1[0].contents[0]
+        except IndexError:
+            return '', '', ''
         parameters = list()
         tables = soup.findAll('table', class_="product-card__properties")
         brand = ''
@@ -77,6 +80,9 @@ class Veha(BaseDriver):
     def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Возвращает офферы"""
         name, article, brand = self._get_product(soup)
+        if name == article == brand == '':
+            print(f'IndexError for {link_data.url}')
+            return []
         price = self._get_price(soup)
         count = self._get_count(soup)
         if count == 0:
