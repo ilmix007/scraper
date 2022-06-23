@@ -65,12 +65,15 @@ class SiteFacade:
         return urls
 
     def clear_urls(self):
+        """Удалить все ссылки сайта"""
         return self.site.urls.all().delete()
 
     def get_shops(self):
+        """Получить все магазины сайта"""
         return self.site.shops.all()
 
     def update_offers(self, offers: List[OfferData]):
+        """Обновить предложения в БД"""
         for offer in offers:
             article, _ = Article.objects.get_or_create(art=offer.article.strip(),
                                                        defaults=dict(art=offer.article.strip()))
