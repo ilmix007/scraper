@@ -72,7 +72,7 @@ class BrandAdmin(admin.ModelAdmin):
 class OfferAdmin(admin.ModelAdmin):
     list_display = ['product', 'shop', 'count', 'price']
     search_fields = ['product', 'shop']
-    list_filter = ['product__brand']
+    list_filter = ['product__brand', ('shop', admin.RelatedOnlyFieldListFilter)]
     raw_id_fields = ['product', 'shop', 'link', 'imgs']
 
 
