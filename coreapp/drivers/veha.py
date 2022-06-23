@@ -40,7 +40,7 @@ class Veha(BaseDriver):
             return 0
 
     def _get_count(self, soup: BeautifulSoup) -> int:
-        availabilitys = soup.findAll('div', class_="product - card__stock -count")
+        availabilitys = soup.findAll('div', class_="product-card__stock-count")
         for av in availabilitys:
             if 'в наличии' in av.text.lower():
                 count = soup.findAll('span', class_='red-text')[0].text
@@ -79,9 +79,10 @@ class Veha(BaseDriver):
         name, article, brand = self._get_product(soup)
         price = self._get_price(soup)
         count = self._get_count(soup)
+        if count == 0:
+            return []
         offer = OfferData(name=name, brand=brand, article=article, images=[], parameters=[],
                           count=count, price=price, shop_id=shop_id, link=link_data)
-        print(offer)
         return [offer]
 
     def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
