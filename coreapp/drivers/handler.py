@@ -22,6 +22,7 @@ class Handler:
             self.driver = Driver()
 
     def read_robots(self) -> bool:
+        """Прочитать robots.txt сайта"""
         url = f'{self.site.domain}/robots.txt'
         result_data_set, status = self.driver.get_robots(url)
         if status:
@@ -31,6 +32,7 @@ class Handler:
         return False
 
     def read_sitemap(self):
+        """Прочитать sitemap сайта"""
         created, updated = 0, 0
         sitemap_urls = list(self.site.get_site_parameters(['Sitemap', 'sitemap']))
         urls = self.driver.get_urls_from_sitemap(sitemap_urls)
@@ -71,8 +73,8 @@ class Handler:
                 return False
             link_data = LinkData(url)
             self._process_soup(soup, link_data=link_data, shop_id=shop.id)
-            # if settings.DEBUG:
-            #     break
+            if settings.DEBUG:
+                break
             time.sleep(self.site.site.crawl_delay)
         return True
 
