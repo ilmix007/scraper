@@ -1,3 +1,17 @@
-from django.db import models
+from dataclasses import dataclass
 
-# Create your models here.
+import uuid as uuid
+
+
+@dataclass
+class MqttResponse:
+    session: uuid.UUID
+    topic: str
+    text: str
+
+
+@dataclass
+class ProductResult:
+    name: str
+    art: str
+    brand: str
