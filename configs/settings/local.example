@@ -13,4 +13,9 @@ DATABASES = {
         'HOST': '',
     }
 }
+# celenuim
 CHROME_PATH = ''
+
+# mqtt
+MQTT_USERNAME = ''
+MQTT_PASSWORD = ''
