@@ -107,8 +107,9 @@ class SiteFacade:
             except (City.DoesNotExist, City.MultipleObjectsReturned):
                 city = None
             obj, created = Shop.objects.update_or_create(site=self.site,
-                                                         name=shopdata.name,
+                                                         getparam=shopdata.shop_param.strip(),
                                                          defaults={'address': shopdata.address.strip(),
+                                                                   'name': shopdata.name,
                                                                    'phone': shopdata.phone.strip(),
                                                                    'city': city,
                                                                    'getparam': shopdata.shop_param.strip()})
