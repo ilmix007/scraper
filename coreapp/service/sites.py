@@ -32,6 +32,7 @@ class SiteFacade:
                                                                defaults={'key': key, 'value': val, 'site': self.site})
 
     def create_urls(self, urlset):
+        """Создать ссылки по списку url-ов"""
         created = 0
         updated = 0
         for url in urlset:
@@ -45,6 +46,7 @@ class SiteFacade:
         return created, updated
 
     def create_links(self, links: List[LinkData]):
+        """Создать ссылки по списку LinkData"""
         created = 0
         updated = 0
         for link in links:
@@ -56,28 +58,30 @@ class SiteFacade:
                 updated += 1
         return created, updated
 
-    def get_urls(self, keys: list):
+    def get_site_parameters(self, keys: list):
+        """Получить параметры сайта"""
         keys = ParameterKey.objects.filter(title__in=keys)
         urls = list(self.site.parameters.filter(key__in=keys).values_list('value', flat=True))
         return urls
 
     def clear_urls(self):
+        """Удалить все ссылки сайта"""
         return self.site.urls.all().delete()
 
     def get_shops(self):
+        """Получить все магазины сайта"""
         return self.site.shops.all()
 
     def update_offers(self, offers: List[OfferData]):
+        """Обновить предложения в БД"""
         for offer in offers:
             article, _ = Article.objects.get_or_create(art=offer.article.strip(),
                                                        defaults=dict(art=offer.article.strip()))
+            payload = {'article': article, 'name': offer.name.strip()}
             if offer.brand:
                 brand, _ = Brand.objects.get_or_create(name=offer.brand.strip(), defaults={'name': offer.brand.strip()})
-                product, _ = Product.objects.get_or_create(brand=brand, article=article, defaults={
-                    'brand': brand,
-                    'article': article})
-            else:
-                product, _ = Product.objects.get_or_create(article=article, defaults={'article': article})
+                payload.update({'brand': brand})
+            product, _ = Product.objects.get_or_create(article=article, defaults=payload)
             for param in offer.parameters:
                 Parameter.objects.get_or_create(name=param.name, value=param.value,
                                                 defaults={'name': param.name, 'value': param.value})

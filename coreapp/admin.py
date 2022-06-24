@@ -1,3 +1,5 @@
+import time
+
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -34,6 +36,7 @@ class LinkAdmin(admin.ModelAdmin):
                 success_urls.append(link.site.title)
             else:
                 fail_urls.append(link.site.title)
+            time.sleep(site_facade.site.crawl_delay)
 
         if len(success_urls) > 0 and len(fail_urls) == 0:
             self.message_user(request, f"Успешно {len(success_urls)}", messages.SUCCESS)
@@ -69,7 +72,7 @@ class BrandAdmin(admin.ModelAdmin):
 class OfferAdmin(admin.ModelAdmin):
     list_display = ['product', 'shop', 'count', 'price']
     search_fields = ['product', 'shop']
-    list_filter = ['product__brand']
+    list_filter = ['product__brand', ('shop', admin.RelatedOnlyFieldListFilter)]
     raw_id_fields = ['product', 'shop', 'link', 'imgs']
 
 

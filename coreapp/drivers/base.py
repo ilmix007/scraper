@@ -94,10 +94,15 @@ class BaseDriver(ABC):
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
+        # chrome_options.headless = True
+        # chrome_options.add_argument("--enable-javascript")
         service = Service(executable_path=settings.CHROME_PATH)
         wd = webdriver.Chrome(options=chrome_options, service=service)
         wd.get(url)
-        html = wd.page_source.replace('\n', '').replace('\r', '')
+        time.sleep(1)
+        wd.refresh()
+        html = wd.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
+        html = html.replace('\n', '').replace('\r', '')
         wd.quit()
         soup = BeautifulSoup(html, 'lxml')
         return soup
@@ -110,7 +115,7 @@ class BaseDriver(ABC):
         LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
         return dict(), False
 
-    def get_urls_from_sitemap(self, sitemap_urls) -> Set:
+    def get_urls_from_sitemap(self, sitemap_urls: List) -> Set:
         """Возвращает ссылки из sitemap"""
         result = set()
         for sitemap_url in sitemap_urls:
@@ -181,7 +186,7 @@ class BaseDriver(ABC):
 class Driver(BaseDriver):
     """Драйвер по умолчанию"""
 
-    def get_offers(self, soup: BeautifulSoup, shop_id: int , link_data: LinkData) -> List[OfferData]:
+    def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Получить офферы"""
         pass
 
