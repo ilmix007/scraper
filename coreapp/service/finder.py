@@ -13,8 +13,8 @@ class ProuctFace:
     """Фасад для поиска товаров и предложений"""
 
     @staticmethod
-    def get_products(self, request: str) -> List[ProductResult]:
+    def get_products(request: str) -> List[ProductResult]:
         result = list()
         for prod in Product.objects.filter(article__art__icontains=request):
-            result.append(ProductResult(name=prod.name, art=prod.art, brand=prod.brand))
+            result.append(ProductResult(name=prod.name, art=prod.article, brand=prod.brand))
         return result
