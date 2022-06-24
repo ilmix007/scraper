@@ -20,7 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_dnf',
-    'coreapp'
+    'coreapp',
+    'mqttapp'
 ]
 
 MIDDLEWARE = [
@@ -95,3 +96,9 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param', 'Allow', 'Disallow', 'User-Agent']
+
+# mqtt
+MQTT_SERVER = 'geozip.ru'
+MQTT_PORT = 1883
+MQTT_TOPIC_REQUEST = "geozip/request"
+MQTT_TOPIC_RESPONSE = "geozip/response"
