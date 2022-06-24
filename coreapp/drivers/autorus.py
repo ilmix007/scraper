@@ -12,17 +12,17 @@ LOGGER = logging.getLogger(__name__)
 class Autorus(BaseDriver):
     def get_offers(self, soup: BeautifulSoup, shop_id: int, link_data: LinkData) -> List[OfferData]:
         """Получить список оферов"""
-        pass
+        return []
 
     def get_link_type(self, soup: BeautifulSoup, link: LinkData) -> LinkData:
         """Определить тип ссылки"""
-        pass
+        return link
 
     def get_links(self, soup: BeautifulSoup, link: LinkData) -> List[LinkData]:
         """Возвращает список ссылок"""
-        pass
+        return []
 
     def get_shops(self, soup: BeautifulSoup, link: LinkData) -> List[ShopData]:
         """Получить список магазинов"""
-        pass
+        return []
 
