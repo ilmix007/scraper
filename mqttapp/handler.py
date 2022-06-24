@@ -1,61 +1,58 @@
 import json
+import time
+import uuid
+
 from django.conf import settings
 import paho.mqtt.client as mqtt
-
 from uuid import UUID
 import random
 import logging
 
+from coreapp.service.finder import ProuctFace
+
 LOGGER = logging.getLogger(__name__)
 
 
-class MqttHandler:
-    def __init__(self):
-        self.t_out = 1
-        self.server = settings.MQTT_SERVER
-        self.port = settings.MQTT_PORT
-        self.topic = f'{settings.MQTT_TOPIC_REQUEST}/#'
-        self.client_id = f'scraper-{random.randint(1, 100)}'
-        self.answer = ''
-        self.client = mqtt.Client(client_id=self.client_id, clean_session=True)
-        self.client.username_pw_set(
-            str(settings.MQTT_USERNAME), str(settings.MQTT_PASSWORD))
-        self.suggests_order = dict()
-        self.offer_order = dict()
+class Handler:
+    def __init__(self, mqtt_client):
+        self.mqtt_client = mqtt_client
 
-    def connect(self):
-        status = self.client.connect(self.server, self.port)
-        if status == 0:
-            self.client.subscribe(self.topic)
-            self.client.on_message = self.on_message
-            self.client.loop_start()
-            return True
-        raise MqttException('MQTT: no connection')
-
-    def on_message(self, client, userdata, msg):
+    def run(self):
         """
-            Получает сообщения от mqtt.
+            Цикл проверяющий и отдающий подсказки и предложения
+            из zzap на mqtt
         """
-        if msg.topic.find("geozip/request") >= 0:
-            topic_uuid = msg.topic.split('/')[-1]
-            try:
-                session = UUID(topic_uuid, version=4)
-            except (ValueError, TypeError):
-                LOGGER.warning('Bad session UUID in mqtt topic')
-                return
-            try:
-                data = str(msg.payload.decode())
-                py_data = json.loads(data)
-            except Exception as ex:
-                LOGGER.exception(f'Bad mqtt message, exception: {ex}')
-                return
-            if msg.topic.find("geozip/request/suggests") >= 0:
-                text = py_data.get('data').get('request')
-                if text and session:
-                    self.suggests_order.update({session: text})
-            elif msg.topic.find("geozip/request/offers") >= 0:
-                data = py_data.get('data').get('request')
-                print(data)
+        while True:
+            time.sleep(1)
+            if len(self.mqtt_client.offer_order) > 0:
+                try:
+                    key, item = self.mqtt_client.offer_order.popitem()
+                except Exception as ex:
+                    LOGGER.debug(f'mqtt_handler.offer_order.popitem: {ex}')
+                    continue
+                # data, session = self.search_offer(item)
+                # if isinstance(data, dict):
+                #     self.send_answer(data, session)
+                #     continue
+            if len(self.mqtt_client.suggests_order) > 0:
+                try:
+                    session, resp = self.mqtt_client.suggests_order.popitem()
+                except Exception as ex:
+                    LOGGER.debug(f'mqtt_handler.suggests_order.popitem: {ex}')
+                    continue
+                prods = ProuctFace.get_products(resp.text)
+                print("prods")
+                print(prods)
+                if isinstance(prods, list):
+                    self.send_answer(prods, session, datatype='product')
+                    continue
 
-class MqttException(Exception):
-    pass
+    def send_answer(self, data: list, session: uuid.UUID, datatype):
+        """Отправка данных в mqtt"""
+
+        if datatype == "product":
+            return self.mqtt_client.client.publish(
+                f"{settings.MQTT_TOPIC_RESPONSE}/suggests/{session}",
+                json.dumps(data, ensure_ascii=False))
+        return False
+
