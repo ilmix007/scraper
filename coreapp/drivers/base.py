@@ -1,17 +1,22 @@
+import os
 import time
 from abc import ABC, abstractmethod
 from random import randint
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Set
+from urllib.error import URLError
+from urllib.parse import ParseResult
+
 from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
 import logging
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-
+import urllib.robotparser
+import urllib.request
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver', 'Driver', 'LinkData', 'ShopData', 'ParameterData', 'OfferData']
@@ -93,8 +98,9 @@ class BaseDriver(ABC):
         """Возвращает объект BeautifulSoup"""
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
-        user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
-        chrome_options.add_argument(f'user-agent={user_agent}')
+        # user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) \
+        # Chrome/60.0.3112.50 Safari/537.36'
+        chrome_options.add_argument(f'user-agent={self.user_agent}')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--Accept=*/*')
         chrome_options.add_argument('--window-size=1920,1080')
@@ -102,15 +108,27 @@ class BaseDriver(ABC):
         chrome_options.add_argument('--Sec-Fetch-Mode=cors')
         chrome_options.add_argument('--Sec-Fetch-Site=same-site')
         chrome_options.add_argument('--Connection=keep-alive')
-        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--allow-running-insecure-content')
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_argument("--accept-language=ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+        chrome_options.add_argument("--enable-javascript")
+        # chrome_options.add_argument("javascript.enabled", True)
+
+        # userProfile = "/home/ilmix/.config/google-chrome/Default"
+        # chrome_options.add_argument("user-data-dir={}".format(userProfile))
+
+        # chrome_options.add_argument('--headless')
         # chrome_options.headless = True
         # chrome_options.add_argument("--enable-javascript")
         service = Service(executable_path=settings.CHROME_PATH)
         wd = webdriver.Chrome(options=chrome_options, service=service)
+        # wd.get('https://ya.ru')
+        # handle = wd.current_window_handle
+        # wd.service.stop()
+        # time.sleep(6)
+        # wd = webdriver.Chrome(options=chrome_options, service=service)
+        # wd.switch_to.window(handle)
         wd.get(url)
         time.sleep(1)
         wd.refresh()
@@ -120,13 +138,35 @@ class BaseDriver(ABC):
         soup = BeautifulSoup(html, 'lxml')
         return soup
 
-    def get_robots(self, url: str) -> (Dict, bool):
-        result = self._request(url)
-        if result.status_code == 200:
-            result_data_set = self._process_robots(result.content.decode())
-            return result_data_set, True
-        LOGGER.error(f"Error receiving robots.txt\n Url: {url}, \nresult: {result}. User-agent: {self.user_agent}")
-        return dict(), False
+    def get_robots(self, url: ParseResult) -> Dict:
+        result = dict()
+        rp = urllib.robotparser.RobotFileParser()
+        rp.set_url(url.geturl())
+        print(url.geturl())
+        try:
+            rp.read()
+        except URLError:
+            url_str = f'https://{url.netloc}/robots.txt'
+            print(url_str)
+            resp = self._request(url_str)
+            if resp.status_code == 200:
+                robots_txt = resp.content.decode()
+                robots_txt = robots_txt.replace('\r', '')
+                robots_txt = robots_txt.replace('\t', '')
+                rp.parse(robots_txt.splitlines())
+        rrate = rp.request_rate("*")
+        if rrate is not None:
+            result.update({'Request-rate': [rrate.seconds]})
+        if rp.crawl_delay("*") is not None:
+            result.update({'Crawl-delay': [rp.crawl_delay("*")]})
+            print(rp.site_maps())
+        if isinstance(rp.site_maps(), list):
+            result.update({'Sitemap': rp.site_maps()})
+        elif isinstance(rp.site_maps(), str):
+            result.update({'Sitemap': [rp.site_maps()]})
+        # else:
+        print(result)
+        return result
 
     def get_urls_from_sitemap(self, sitemap_urls: List) -> Set:
         """Возвращает ссылки из sitemap"""
@@ -142,26 +182,29 @@ class BaseDriver(ABC):
                 LOGGER.error(f"Error receiving sitemap {resp}. User-agent: {self.user_agent}")
         return result
 
-    def _process_robots(self, robots_txt: str) -> dict:
-        """Обработать robots.txt"""
-        result_data_set = dict()
-        robots_txt = robots_txt.replace('\r', '')
-        robots_txt = robots_txt.replace('\t', '')
-        robots_arr = robots_txt.split()
-        if len(robots_arr) > 0:
-            if len(robots_arr[0]) > 30 and len(robots_arr) < 2:
-                for item in settings.ROBOT_KEYS:
-                    robots_txt = robots_txt.replace(f' {item}', f'\n{item}')
-        for line in robots_txt.split("\n"):
-            if len(line) > 0:
-                if line[0] != '#':
-                    robots_txt = robots_txt.replace('\r', '')
-                    key = line.split(': ')[0].split(' ')[0]
-                    value = line.split(': ')[1].split(' ')[0]
-                    if key not in result_data_set.keys():
-                        result_data_set[key] = list()
-                    result_data_set[key].append(value)
-        return result_data_set
+    # def _process_robots(self, robots_txt: str) -> dict:
+    #     """Обработать robots.txt"""
+    #
+    #     result_data_set = dict()
+    #     robots_txt = robots_txt.replace('\r', '')
+    #     robots_txt = robots_txt.replace('\t', '')
+    #     robots_arr = robots_txt.split()
+    #     if len(robots_arr) > 0:
+    #         if len(robots_arr[0]) > 30 and len(robots_arr) < 2:
+    #             for item in settings.ROBOT_KEYS:
+    #                 robots_txt = robots_txt.replace(f' {item}', f'\n{item}')
+    #     for line in robots_txt.split("\n"):
+    #         if len(line) > 0:
+    #             if line[0] != '#':
+    #                 robots_txt = robots_txt.replace('\r', '')
+    #                 key = line.split(':')[0].split(' ')[0]
+    #                 print(key)
+    #                 value = line.split(':')[1].split(' ')[0]
+    #                 print(value)
+    #                 if key not in result_data_set.keys():
+    #                     result_data_set[key] = list()
+    #                 result_data_set[key].append(value)
+    #     return result_data_set
 
     def _request(self, url):
         if url.find('http') < 0:

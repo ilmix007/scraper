@@ -1,9 +1,8 @@
 import time
-from typing import List
+from urllib.parse import urlparse
 
-from bs4 import BeautifulSoup
 from django.conf import settings
-from coreapp.drivers.base import Driver, LinkData, ShopData
+from coreapp.drivers.base import Driver, LinkData
 from coreapp.drivers.conf import DRIVER_CONF
 from coreapp.service.sites import SiteFacade
 import logging
@@ -23,9 +22,10 @@ class Handler:
 
     def read_robots(self) -> bool:
         """Прочитать robots.txt сайта"""
-        url = f'{self.site.domain}/robots.txt'
-        result_data_set, status = self.driver.get_robots(url)
-        if status:
+        url = f'https://{self.site.domain}/robots.txt'
+        url = urlparse(url)
+        result_data_set = self.driver.get_robots(url)
+        if result_data_set is not None:
             for key, values in result_data_set.items():
                 self.site.set_params(key, values)
             return True
