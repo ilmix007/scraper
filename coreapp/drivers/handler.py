@@ -31,6 +31,14 @@ class Handler:
             return True
         return False
 
+    def parse_sitemap(self):
+        from usp.tree import sitemap_tree_for_homepage
+        created, updated = 0, 0
+        urls = sitemap_tree_for_homepage(f'https://{self.site.domain}')
+        if urls:
+            created, updated = self.site.create_urls(urls)
+        return created, updated
+
     def read_sitemap(self):
         """Прочитать sitemap сайта"""
         created, updated = 0, 0
