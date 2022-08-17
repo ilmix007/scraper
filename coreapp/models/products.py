@@ -1,7 +1,7 @@
 from django.db import models
 
 from coreapp.mixins.db import UpdatedMixin, CreatedMixin
-from coreapp.models.sites import Shop, Url
+from coreapp.models.sites import Shop, Link
 
 
 class Brand(CreatedMixin, UpdatedMixin, models.Model):
@@ -30,10 +30,11 @@ class Article(CreatedMixin, UpdatedMixin, models.Model):
 
 class Product(CreatedMixin, UpdatedMixin, models.Model):
     """ Товар """
-    brand = models.ForeignKey(Brand, verbose_name='Бренд', related_name='articles', on_delete=models.PROTECT)
+    brand = models.ForeignKey(Brand, verbose_name='Бренд', related_name='articles', blank=True, null=True,
+                              on_delete=models.SET_NULL)
     article = models.ForeignKey(Article, verbose_name='Артикул', related_name='products',
                                 on_delete=models.PROTECT, null=True, blank=True)
-    name = models.CharField(verbose_name='Наименование', max_length=255, unique=True)
+    name = models.CharField(verbose_name='Наименование', max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.article} - {self.brand})'
@@ -62,9 +63,10 @@ class Parameter(CreatedMixin, UpdatedMixin, models.Model):
 class Offer(CreatedMixin, UpdatedMixin, models.Model):
     """ Параметры товаров """
     product = models.ForeignKey(Product, verbose_name='Товар', related_name='offers', on_delete=models.CASCADE)
+    name = models.CharField(verbose_name='Наименование', max_length=255, null=True, blank=True)
     shop = models.ForeignKey(Shop, verbose_name='Магазин', related_name='offers', on_delete=models.CASCADE)
-    link = models.ForeignKey(Url, verbose_name='Ссылка', related_name='offers', on_delete=models.CASCADE)
-    imgs = models.ManyToManyField(Url, verbose_name='Изображения', blank=True)
+    link = models.ForeignKey(Link, verbose_name='Ссылка', related_name='offers', on_delete=models.CASCADE)
+    imgs = models.ManyToManyField(Link, verbose_name='Изображения', blank=True)
     count = models.IntegerField(verbose_name='Количество')
     price = models.FloatField(verbose_name='Цена')
 

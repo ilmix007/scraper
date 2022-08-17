@@ -2,6 +2,8 @@ from .base import *
 
 DEBUG = True
 SECRET_KEY = ''
+STATIC_ROOT = ''
+ALLOWED_HOSTS = ["*"]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -11,3 +13,4 @@ DATABASES = {
         'HOST': '',
     }
 }
+CHROME_PATH = ''

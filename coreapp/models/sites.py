@@ -1,13 +1,16 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django_dnf.fields import DomainNameField
 from coreapp.mixins.db import CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin
+from urllib.parse import urlparse
+
+from coreapp.models import City
 
 
-class Url(CreatedMixin, UpdatedMixin, models.Model):
-    link = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
+class Link(CreatedMixin, UpdatedMixin, models.Model):
+    url = models.URLField(verbose_name='Ссылка', max_length=255, unique=True)
     site = models.ForeignKey('coreapp.Site', verbose_name='Сайт', related_name='urls', on_delete=models.CASCADE)
-    alt = models.CharField(verbose_name='Альтернативный текст', max_length=63, blank=True, null=True)
+    alt = models.CharField(verbose_name='Альтернативный текст', max_length=255, blank=True, null=True)
     last_processing = models.DateTimeField(verbose_name='Дата последней обработки', blank=True, null=True)
 
     class Meta:
@@ -15,21 +18,25 @@ class Url(CreatedMixin, UpdatedMixin, models.Model):
         verbose_name_plural = 'Ссылки'
 
     def set_schema(self):
-        self.link = self.link.replace('http://', 'https://', 1)
+        self.link = self.url.replace('http://', 'https://', 1)
+
+    @property
+    def domain(self):
+        return urlparse(self.link).netloc.replace('www.', '', 1)
 
 
 class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', null=True, blank=True, max_length=127)
-    url = models.URLField(verbose_name='url', unique=True, max_length=255)
-    crawl_delay = models.IntegerField(verbose_name='Задержка обхода', null=True, blank=True)
+    domain = DomainNameField(verbose_name='Домен', unique=True)
     DEFAULT_TIMEOUT = 0.5
+    crawl_delay = models.FloatField(verbose_name='Задержка обхода', default=DEFAULT_TIMEOUT)
 
     def __str__(self):
-        return self.name if self.name else self.url
+        return self.name if self.name else self.domain
 
     @property
     def title(self):
-        return self.name if self.name else self.url
+        return self.name if self.name else self.domain
 
     @property
     def timeout(self):
@@ -41,9 +48,6 @@ class Site(CreatedMixin, UpdatedMixin, StartProcessMixin, FinishProcessMixin, mo
     class Meta:
         verbose_name = 'Сайт'
         verbose_name_plural = 'Сайты'
-
-    def set_schema(self):
-        self.url = self.url.replace('http://', 'https://', 1)
 
 
 class ParameterKey(models.Model):
@@ -73,13 +77,16 @@ class SiteParameter(models.Model):
 
 class Shop(CreatedMixin, UpdatedMixin, models.Model):
     name = models.CharField(verbose_name='Наименование', unique=True, max_length=127)
+    city = models.ForeignKey(to=City, verbose_name='Город', blank=True, null=True, on_delete=models.SET_NULL)
     address = models.CharField(verbose_name='Адрес', unique=True, max_length=255)
-    phone = PhoneNumberField(null=False, blank=False, unique=True)
+    phone = PhoneNumberField(null=True, blank=True)
     site = models.ForeignKey(Site, verbose_name='Сайт', related_name='shops', on_delete=models.CASCADE)
+    getparam = models.CharField(verbose_name='Get-параметр', max_length=63, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
+        unique_together = ('site', 'getparam')
         verbose_name = 'Магазин'
         verbose_name_plural = 'Магазины'

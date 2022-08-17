@@ -17,12 +17,13 @@ class City(models.Model):
     """ Город """
 
     name = models.CharField(verbose_name='Наименование', max_length=63)
+    description = models.CharField(verbose_name='Описание', max_length=63, null=True, blank=True)
     region = models.ForeignKey(Region, verbose_name='Регион', related_name='cities', on_delete=models.PROTECT)
     lat = models.IntegerField(verbose_name='Широта', null=True, blank=True)
     long = models.IntegerField(verbose_name='Долгота', null=True, blank=True)
 
     class Meta:
-        unique_together = ('name', 'region')
+        unique_together = ('name', 'region', 'description')
         verbose_name = 'Город'
         verbose_name_plural = 'Города'
         ordering = ['name']
