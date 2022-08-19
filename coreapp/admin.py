@@ -2,7 +2,7 @@ import time
 
 from django.contrib import admin
 from django.utils.html import format_html
-
+from django.conf import settings
 from coreapp.drivers.handler import Handler
 from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Link, Region, City
 from django.contrib import messages
@@ -71,7 +71,7 @@ class BrandAdmin(admin.ModelAdmin):
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
     list_display = ['product', 'shop', 'count', 'price']
-    search_fields = ['product', 'shop']
+    search_fields = ['product__name', 'shop__name', 'product__article__art']
     list_filter = ['product__brand', ('shop', admin.RelatedOnlyFieldListFilter)]
     raw_id_fields = ['product', 'shop', 'link', 'imgs']
 
@@ -97,12 +97,15 @@ class SiteAdmin(admin.ModelAdmin):
         for site in queryset:
             site_facade = SiteFacade(site)
             handler = Handler(site_facade)
-            try:
+            if settings.DEBUG:
                 result = handler.read_robots()
-            except Exception as ex:
-                LOGGER.error(f'handler.read_robots(). Exception: {ex}')
-                fail_sites.append(site.title)
-                continue
+            else:
+                try:
+                    result = handler.read_robots()
+                except Exception as ex:
+                    LOGGER.error(f'handler.read_robots(). Exception: {ex}')
+                    fail_sites.append(site.title)
+                    continue
             if result:
                 success_sites.append(site.title)
             else:
@@ -120,7 +123,7 @@ class SiteAdmin(admin.ModelAdmin):
     @admin.action(description='Прочитать sitemap')
     def read_sitemap(self, request, queryset):
         created, updated = 0, 0
-        LOGGER.warning(f'Start read sitemap')
+        LOGGER.warning('Start read sitemap')
         for site in queryset:
             LOGGER.info(f'Start read sitemap {site.title}')
             site_facade = SiteFacade(site)

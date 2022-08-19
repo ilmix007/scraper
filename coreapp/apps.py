@@ -9,6 +9,3 @@ class CoreappConfig(AppConfig):
     def ready(self):
         # Инициализация сигналов
         from . import signal_receivers
-
-
-
