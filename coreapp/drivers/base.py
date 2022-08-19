@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 from random import randint
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Set
 from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.service import Service
 
 from coreapp.drivers.user_agents import USER_AGENTS
 from django.conf import settings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 LOGGER = logging.getLogger(__name__)
 __all__ = ['BaseDriver', 'Driver', 'LinkData', 'ShopData', 'ParameterData', 'OfferData']
@@ -93,20 +93,26 @@ class BaseDriver(ABC):
         """Возвращает объект BeautifulSoup"""
         LOGGER.debug(f"Start {self.__class__}.scrape()")
         chrome_options = Options()
-        user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
-        chrome_options.add_argument(f'user-agent={user_agent}')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--Accept=*/*')
-        chrome_options.add_argument('--window-size=1920,1080')
-        chrome_options.add_argument('--Sec-Fetch-Dest=empty')
-        chrome_options.add_argument('--Sec-Fetch-Mode=cors')
-        chrome_options.add_argument('--Sec-Fetch-Site=same-site')
-        chrome_options.add_argument('--Connection=keep-alive')
+        # user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
+
         chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--allow-running-insecure-content')
-        chrome_options.add_argument("--start-maximized")
-        chrome_options.add_argument("--accept-language=ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+
+        # chrome_options.add_argument(f'user-agent={user_agent}')
+        # chrome_options.add_argument('--no-sandbox')
+        # chrome_options.add_argument('--Accept=*/*')
+        # chrome_options.add_argument('--window-size=1920,1080')
+        # chrome_options.add_argument('--Sec-Fetch-Dest=empty')
+        # chrome_options.add_argument('--Sec-Fetch-Mode=cors')
+        # chrome_options.add_argument('--Sec-Fetch-Site=same-site')
+        # chrome_options.add_argument('--Connection=keep-alive')
+        # chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--disable-gpu')
+        # chrome_options.add_argument('--allow-running-insecure-content')
+        # chrome_options.add_argument("--start-maximized")
+        # chrome_options.add_argument("--accept-language=ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+
         # chrome_options.headless = True
         # chrome_options.add_argument("--enable-javascript")
         service = Service(executable_path=settings.CHROME_PATH)

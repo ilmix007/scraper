@@ -71,7 +71,7 @@ class BrandAdmin(admin.ModelAdmin):
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
     list_display = ['product', 'shop', 'count', 'price']
-    search_fields = ['product', 'shop']
+    search_fields = ['product__name', 'shop__name', 'product__article__art']
     list_filter = ['product__brand', ('shop', admin.RelatedOnlyFieldListFilter)]
     raw_id_fields = ['product', 'shop', 'link', 'imgs']
 
@@ -120,7 +120,7 @@ class SiteAdmin(admin.ModelAdmin):
     @admin.action(description='Прочитать sitemap')
     def read_sitemap(self, request, queryset):
         created, updated = 0, 0
-        LOGGER.warning(f'Start read sitemap')
+        LOGGER.warning('Start read sitemap')
         for site in queryset:
             LOGGER.info(f'Start read sitemap {site.title}')
             site_facade = SiteFacade(site)
