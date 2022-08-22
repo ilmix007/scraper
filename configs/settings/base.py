@@ -1,25 +1,11 @@
 from pathlib import Path
 
 
-DEBUG = False
-SECRET_KEY = 'jv)^b6ulv9ejuo2lnr!_5j7p1)&gn*)17tbc##q67s*r0wyoqw'
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'gz',
-         'USER': 'gz',
-         'PASSWORD': 'superservergeozip',
-         'HOST': '127.0.0.1',
-     }
-}
-STATIC_ROOT = '/home/gz/scraper/scraper/static'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-ALLOWED_HOSTS = ['*']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -79,6 +65,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -113,3 +100,4 @@ MQTT_TOPIC = "geozip"
 MQTT_TOPIC_REQUEST = "geozip/request"
 MQTT_TOPIC_RESPONSE = "geozip/response"
 MQTT_TOPIC_ACCEPT = "geozip/accept"
+
