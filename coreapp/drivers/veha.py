@@ -28,7 +28,11 @@ class Veha(BaseDriver):
         return link
 
     def _get_price(self, soup: BeautifulSoup) -> int:
-        price = soup.findAll('div', class_='product-card__price')[0].text
+        try:
+            price = soup.findAll('div', class_='product-card__price')[0].text
+        except IndexError as er:
+            LOGGER.error(f'IndexError: {er}')
+            return 0
         price = price.replace('\n', '').replace(' ', '')
         prices = re.findall(r'\d+\.\d+', price)
         if len(prices) == 1:

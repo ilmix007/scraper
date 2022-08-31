@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.conf import settings
 from coreapp.drivers.handler import Handler
-from coreapp.models import Product, Article, Brand, Offer, Shop, Site, ParameterKey, SiteParameter, Link, Region, City
+from coreapp.models import Product, Article, Brand, Offer, Shop, Site, \
+    ParameterKey, SiteParameter, Link, Region, City
 from django.contrib import messages
 import logging
 

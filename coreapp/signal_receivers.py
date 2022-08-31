@@ -43,6 +43,7 @@ def search_offer(sender, zzap_tuple: tuple):
         one_offer['price'] = offer.price
         one_offer['quantity'] = offer.count
         one_offer['link'] = offer.link.url
+        one_offer['domain'] = offer.link.site.domain
         one_offer['address'] = f'{offer.shop.city}, {offer.shop.address}'
         offers_list.append(one_offer)
         one_offer = {}
