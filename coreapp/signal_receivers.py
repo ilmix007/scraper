@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.dispatch import receiver
 from django import dispatch
+from typing import Union
 
 import uuid
 import json
@@ -29,12 +30,13 @@ def mqtt_offer_results_receiver(sender, **kwargs):
             send_answer(sender, data, session)
 
 
-def search_offer(sender, zzap_tuple: tuple):
-    """
+def search_offer(sender, request_data: Union[tuple, dict]):
+    """g
         Получаем массив с результатами поиска от скрапера.
     """
-    accept_uuid, zzap_req = zzap_tuple
-    partnumber = zzap_req.get('partnumber')
+    # accept_uuid, zzap_req = request_data
+    # partnumber = zzap_req.get('article')
+    partnumber = request_data.get('article')
     offers_list = []
     one_offer = {}
     offers = Offer.objects.filter(product__article__art=partnumber)
@@ -51,7 +53,7 @@ def search_offer(sender, zzap_tuple: tuple):
     uuid_req = uuid.uuid4()
     session = uuid.uuid4()
     data = {
-        "accept_uuid": str(accept_uuid),
+        # "accept_uuid": str(accept_uuid),
         "uuid": str(uuid_req),
         "data": offers_list,
         "app": "scraper",

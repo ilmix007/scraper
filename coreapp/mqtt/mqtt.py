@@ -12,9 +12,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 class MqttHandler:
-    # url_main = ZzapUrls.URL_MAIN.value
-    # url_suggest = ZzapUrls.URL_SUGGEST.value
-    # url_offer = ZzapUrls.URL_OFFER.value
     server = settings.MQTT_SERVER
     port = settings.MQTT_PORT
     topic = f'{settings.MQTT_TOPIC_REQUEST}/#'
@@ -57,13 +54,14 @@ class MqttHandler:
             except Exception as ex:
                 LOGGER.exception(f'Bad mqtt message, exception: {ex}')
                 return
-            if msg.topic.find("geozip/request/offers") >= 0:
+            if msg.topic.find("geozip/request/scraper") >= 0:
                 text = py_data.get('data').get('request')
-                accept_uuid = py_data.get('accept_uuid')
+                # accept_uuid = py_data.get('accept_uuid')
 
-                if text and session and accept_uuid:
-                    # print('TSA: ', text, session, accept_uuid)
-                    self.offer_order.update({session: (accept_uuid, text)})
+                # if text and session and accept_uuid:
+                if text and session:
+                    # self.offer_order.update({session: (accept_uuid, text)})
+                    self.offer_order.update({session: text})
                     mqtt_offer_results_signal.send(sender=self.__class__)
 
 
