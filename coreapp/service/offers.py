@@ -19,12 +19,11 @@ class OfferFace:
                                 address=Concat('shop__city__name', Value(' '), 'shop__address'),
                                 product_name=F('name'),
                                 quantity=F('count'),
+                                domain=F('shop__site__domain'),
                                 phone=F('shop__phone'))
-        result = Offer.objects.filter(**filter_payload).annotate(**annotate_payload).values('name', 'article',
-                                                                                            'brand', 'shop_name',
-                                                                                            'address', 'phone',
-                                                                                            'count', 'price',
-                                                                                            'link__url')
+        values_payload = ('name', 'article', 'brand', 'domain', 'shop_name',
+                          'address', 'phone', 'quantity', 'price', 'link__url')
+        result = Offer.objects.filter(**filter_payload).annotate(**annotate_payload).values(*values_payload)
         for item in result:
             item['link'] = item.pop('link__url')
         return list(result)
