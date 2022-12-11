@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from django.contrib import admin
 from django.utils.html import format_html
@@ -16,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
-    list_display = ['url', 'to_url', 'site', 'last_processing']
+    list_display = ['url', 'to_url', 'site', 'last_processing', 'created', 'updated']
     search_fields = ['url']
     list_filter = ['site']
     raw_id_fields = ['site']
@@ -35,6 +36,8 @@ class LinkAdmin(admin.ModelAdmin):
             handler = Handler(site_facade)
             if handler.scrape(link.url):
                 success_urls.append(link.site.title)
+                link.last_processing = datetime.now()
+                link.save()
             else:
                 fail_urls.append(link.site.title)
             time.sleep(site_facade.site.crawl_delay)
@@ -51,7 +54,7 @@ class LinkAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['article', 'name', 'brand']
+    list_display = ['article', 'name', 'brand', 'created', 'updated']
     search_fields = ['article', 'name', 'brand']
     list_filter = ['brand']
     raw_id_fields = ['article', ]
@@ -59,19 +62,19 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['art']
+    list_display = ['art', 'created', 'updated']
     search_fields = ['art']
 
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'created', 'updated']
     search_fields = ['name']
 
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ['product', 'shop', 'count', 'price']
+    list_display = ['product', 'shop', 'count', 'price', 'created', 'updated']
     search_fields = ['product__name', 'shop__name', 'product__article__art']
     list_filter = ['product__brand', ('shop', admin.RelatedOnlyFieldListFilter)]
     raw_id_fields = ['product', 'shop', 'link', 'imgs']
@@ -79,7 +82,7 @@ class OfferAdmin(admin.ModelAdmin):
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ['name', 'site', 'address', 'city', 'phone']
+    list_display = ['name', 'site', 'address', 'city', 'phone', 'created', 'updated']
     search_fields = ['name', 'address', 'phone']
     raw_id_fields = ['site', 'city']
     list_filter = ['site', ('city', admin.RelatedOnlyFieldListFilter)]
@@ -87,7 +90,7 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
-    list_display = ['title', 'domain']
+    list_display = ['title', 'domain', 'created', 'updated']
     search_fields = ['name', 'domain']
     actions = ['read_robots', 'read_sitemap', 'clear_urls']
 
