@@ -2,10 +2,12 @@ from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -14,7 +16,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_dnf',
-    'coreapp'
+    'coreapp',
+    'mqttapp'
 ]
 
 MIDDLEWARE = [
@@ -88,14 +91,12 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param',
-              'Allow', 'Disallow', 'User-Agent']
-
+ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param', 'Allow', 'Disallow', 'User-Agent']
 
 # mqtt
 MQTT_SERVER = 'geozip.ru'
 MQTT_PORT = 1883
-MQTT_TOPIC = "geozip"
 MQTT_TOPIC_REQUEST = "geozip/request"
 MQTT_TOPIC_RESPONSE = "geozip/response"
+MQTT_TOPIC = "geozip"
 MQTT_TOPIC_ACCEPT = "geozip/accept"
