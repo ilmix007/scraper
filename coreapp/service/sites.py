@@ -75,8 +75,8 @@ class SiteFacade:
     def update_offers(self, offers: List[OfferData]):
         """Обновить предложения в БД"""
         for offer in offers:
-            article, _ = Article.objects.get_or_create(art=offer.article.strip(),
-                                                       defaults=dict(art=offer.article.strip()))
+            article_clean = offer.article.strip().lower().translate({ord(i): None for i in '+- @#$:;,./[]{}=()*|'})
+            article, _ = Article.objects.get_or_create(art=article_clean, defaults=dict(art=article_clean))
             payload = {'article': article, 'name': offer.name.strip()}
             if offer.brand:
                 brand, _ = Brand.objects.get_or_create(name=offer.brand.strip(), defaults={'name': offer.brand.strip()})
