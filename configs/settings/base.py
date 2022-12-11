@@ -16,8 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_dnf',
-    'coreapp',
-    'mqttapp'
+    'coreapp'
 ]
 
 MIDDLEWARE = [
@@ -96,7 +95,7 @@ ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param', 'Al
 # mqtt
 MQTT_SERVER = 'geozip.ru'
 MQTT_PORT = 1883
-MQTT_TOPIC_REQUEST = "geozip/request"
-MQTT_TOPIC_RESPONSE = "geozip/response"
 MQTT_TOPIC = "geozip"
-MQTT_TOPIC_ACCEPT = "geozip/accept"
+MQTT_TOPIC_REQUEST = "geozip/test/request"
+MQTT_TOPIC_RESPONSE = "geozip/test/response"
+MQTT_TOPIC_ACCEPT = "geozip/test/accept"
