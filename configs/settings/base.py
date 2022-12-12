@@ -88,14 +88,12 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param',
-              'Allow', 'Disallow', 'User-Agent']
-
+ROBOT_KEYS = ['Crawl-delay', 'Host', 'User-agent', 'Sitemap', 'Clean-param', 'Allow', 'Disallow', 'User-Agent']
 
 # mqtt
 MQTT_SERVER = 'geozip.ru'
 MQTT_PORT = 1883
 MQTT_TOPIC = "geozip"
 MQTT_TOPIC_REQUEST = "geozip/request"
-MQTT_TOPIC_RESPONSE = "geozip/response"
+MQTT_TOPIC_RESPONSE = "geozip/response/offers"
 MQTT_TOPIC_ACCEPT = "geozip/accept"
