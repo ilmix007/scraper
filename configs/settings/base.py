@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -98,4 +98,4 @@ MQTT_PORT = 1883
 MQTT_TOPIC = "geozip"
 MQTT_TOPIC_REQUEST = "geozip/request"
 MQTT_TOPIC_RESPONSE = "geozip/response/offers"
-MQTT_TOPIC_ACCEPT = "geozip/test/accept"
+MQTT_TOPIC_ACCEPT = "geozip/accept"
