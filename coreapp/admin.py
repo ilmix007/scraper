@@ -1,4 +1,5 @@
 import time
+import pytz
 from datetime import datetime
 
 from django.contrib import admin
@@ -36,7 +37,7 @@ class LinkAdmin(admin.ModelAdmin):
             handler = Handler(site_facade)
             if handler.scrape(link.url):
                 success_urls.append(link.site.title)
-                link.last_processing = datetime.now()
+                link.last_processing = datetime.now(pytz.timezone('UTC'))
                 link.save()
             else:
                 fail_urls.append(link.site.title)

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from django.core.management.base import BaseCommand
 from django.conf import settings
 import time
@@ -66,7 +67,7 @@ class Command(BaseCommand):
             handler = Handler(site_facade)
             if handler.scrape(link.url):
                 success_urls.append(link.site.title)
-                link.last_processing = datetime.now()
+                link.last_processing = datetime.now(pytz.timezone('UTC'))
                 link.save()
             else:
                 fail_urls.append(link.site.title)
