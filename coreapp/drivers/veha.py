@@ -85,7 +85,6 @@ class Veha(BaseDriver):
         """Возвращает офферы"""
         name, article, brand = self._get_product(soup)
         if name == article == brand == '':
-            print(f'IndexError for {link_data.url}')
             return []
         price = self._get_price(soup)
         count = self._get_count(soup)
